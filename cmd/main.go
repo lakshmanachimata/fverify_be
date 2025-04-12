@@ -9,14 +9,21 @@ import (
 	"kowtha_be/internal/repositories"
 	"kowtha_be/internal/services"
 
+	"kowtha_be/cmd/docs"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/swag/example/basic/docs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options" // Import the generated docs package
 )
 
+// @title Kowtha API
+// @version 1.0
+// @description This is the API documentation for the Kowtha backend.
+// @host localhost:9000
+// @BasePath /
+// @schemes http
 func main() {
 	// Set up MongoDB connection
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -51,7 +58,7 @@ func main() {
 	docs.SwaggerInfo.Title = "Kowtha API"
 	docs.SwaggerInfo.Description = "This is the API documentation for the Kowtha backend."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.Host = "localhost:9000"
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 

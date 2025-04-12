@@ -1,7 +1,15 @@
 {
+    "schemes": [
+        "http"
+    ],
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is the API documentation for the Kowtha backend.",
+        "title": "Kowtha API",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:9000",
+    "basePath": "/",
     "paths": {}
 }
