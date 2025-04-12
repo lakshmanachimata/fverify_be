@@ -1,25 +1,26 @@
 package repositories
 
 import (
-    "context"
-    "go.mongodb.org/mongo-driver/mongo"
+	"context"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type Repository interface {
-    Connect(ctx context.Context) error
-    Disconnect(ctx context.Context) error
+	Connect(ctx context.Context) error
+	Disconnect(ctx context.Context) error
 }
 
 type MongoRepository struct {
-    client *mongo.Client
+	client *mongo.Client
 }
 
 func (r *MongoRepository) Connect(ctx context.Context) error {
-    // Implementation for connecting to MongoDB
-    return nil
+	// Implementation for connecting to MongoDB
+	return nil
 }
 
 func (r *MongoRepository) Disconnect(ctx context.Context) error {
-    // Implementation for disconnecting from MongoDB
-    return nil
+	// Implementation for disconnecting from MongoDB
+	return nil
 }

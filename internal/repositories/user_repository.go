@@ -3,9 +3,10 @@ package repositories
 import (
 	"context"
 	"kowtha_be/internal/models"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type UserRepositoryImpl struct {
@@ -17,9 +18,22 @@ func NewUserRepository(client *mongo.Client, dbName, collectionName string) *Use
 	return &UserRepositoryImpl{collection: collection}
 }
 
-func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) error {
-	_, err := r.collection.InsertOne(ctx, user)
-	return err
+func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
+	user.CreatedTime = time.Now()
+	user.UpdatedTime = time.Now()
+	result, err := r.collection.InsertOne(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the inserted user document
+	var createdUser models.UserModel
+	err = r.collection.FindOne(ctx, bson.M{"_id": result.InsertedID}).Decode(&createdUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createdUser, nil
 }
 
 func (r *UserRepositoryImpl) GetByID(ctx context.Context, id int) (*models.UserModel, error) {
@@ -29,6 +43,7 @@ func (r *UserRepositoryImpl) GetByID(ctx context.Context, id int) (*models.UserM
 }
 
 func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel) error {
+	user.UpdatedTime = time.Now()
 	_, err := r.collection.UpdateOne(ctx, bson.M{"id": user.ID}, bson.M{"$set": user})
 	return err
 }

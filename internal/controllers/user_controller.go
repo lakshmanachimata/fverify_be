@@ -25,9 +25,9 @@ func NewUserController(service *services.UserService) *UserController {
 // @Accept json
 // @Produce json
 // @Param user body models.UserModel true "User data"
-// @Success 201 {object} SimpleResponse
-// @Failure 400 {object} SimpleResponse
-// @Failure 500 {object} SimpleResponse
+// @Success 201 {object} models.UserModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} InternalErrorResponse
 // @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user models.UserModel
@@ -36,12 +36,14 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	if err := uc.Service.CreateUser(c.Request.Context(), &user); err != nil {
+	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
+	// Return the created user model in the response
+	c.JSON(http.StatusCreated, createdUser)
 }
 
 // GetUserByID godoc
@@ -52,8 +54,9 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} models.UserModel
-// @Failure 400 {object} SimpleResponse
-// @Failure 404 {object} SimpleResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} NotFoundResponse
+// @Failure 500 {object} InternalErrorResponse
 // @Router /users/{id} [get]
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")

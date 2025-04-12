@@ -13,8 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
 // @title Kowtha API
@@ -25,17 +26,22 @@ import (
 // @schemes http
 func main() {
 	// Set up MongoDB connection
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI("mongodb+srv://kowtha:nearhop%40123@applicants.cq0no3x.mongodb.net/?appName=Applicants").SetServerAPIOptions(serverAPI)
+	// Create a new client and connect to the server
+	client, err := mongo.Connect(opts)
 	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+		panic(err)
 	}
-
 	defer func() {
 		if err = client.Disconnect(context.TODO()); err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	}()
-
+	// Send a ping to confirm a successful connection
+	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
+	}
 	// Initialize repositories
 	prospectRepo := repositories.NewProspectRepository(client, "kowtha_db", "prospects")
 	userRepo := repositories.NewUserRepository(client, "kowtha_db", "users")
@@ -69,7 +75,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param user body models.UserModel true "User data"
-	// @Success 201 {object} gin.H{"message": "User created successfully"}
+	// @Success 201 {object} models.UserModel
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users [post]

@@ -1,8 +1,36 @@
 basePath: /
 definitions:
-  controllers.SimpleResponse:
+  controllers.ErrorResponse:
     properties:
-      message:
+      details:
+        description: Additional details about the error
+        example: Invalid input data
+        type: string
+      error:
+        description: Error message
+        example: Bad Request
+        type: string
+    type: object
+  controllers.InternalErrorResponse:
+    properties:
+      details:
+        description: Additional details about the error
+        example: Server Error
+        type: string
+      error:
+        description: Error message
+        example: Internal Server Error
+        type: string
+    type: object
+  controllers.NotFoundResponse:
+    properties:
+      details:
+        description: Additional details about the error
+        example: No Data found for the input provided
+        type: string
+      error:
+        description: Error message
+        example: No data
         type: string
     type: object
   models.ProspectModel:
@@ -258,15 +286,15 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/models.ProspectModel'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Create a new prospect
       tags:
       - Prospects
@@ -291,11 +319,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Get a prospect by ID
       tags:
       - Prospects
@@ -317,15 +349,15 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/models.UserModel'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Create a new user
       tags:
       - Users
@@ -350,11 +382,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/controllers.SimpleResponse'
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Get a user by ID
       tags:
       - Users

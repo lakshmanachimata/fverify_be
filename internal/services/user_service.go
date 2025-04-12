@@ -17,7 +17,7 @@ func NewUserService(repo *repositories.UserRepositoryImpl) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, user *models.UserModel) error {
+func (s *UserService) CreateUser(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
 	user.CreatedTime = time.Now()
 	user.UpdatedTime = time.Now()
 	user.Status = models.Created

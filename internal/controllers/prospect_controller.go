@@ -9,8 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SimpleResponse struct {
-	Message string `json:"message"`
+type ErrorResponse struct {
+	Error   string `json:"error" example:"Bad Request"`          // Error message
+	Details string `json:"details" example:"Invalid input data"` // Additional details about the error
+}
+
+type InternalErrorResponse struct {
+	Error   string `json:"error" example:"Internal Server Error"` // Error message
+	Details string `json:"details" example:"Server Error"`        // Additional details about the error
+}
+
+type NotFoundResponse struct {
+	Error   string `json:"error" example:"No data"`                                // Error message
+	Details string `json:"details" example:"No Data found for the input provided"` // Additional details about the error
 }
 
 type ProspectController struct {
@@ -28,9 +39,9 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Accept json
 // @Produce json
 // @Param prospect body models.ProspectModel true "Prospect data"
-// @Success 201 {object} SimpleResponse
-// @Failure 400 {object} SimpleResponse
-// @Failure 500 {object} SimpleResponse
+// @Success 201 {object} models.ProspectModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} InternalErrorResponse
 // @Router /prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
 	var prospect models.ProspectModel
@@ -55,8 +66,9 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Prospect ID"
 // @Success 200 {object} models.ProspectModel
-// @Failure 400 {object} SimpleResponse
-// @Failure 404 {object} SimpleResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} NotFoundResponse
+// @Failure 500 {object} InternalErrorResponse
 // @Router /prospects/{id} [get]
 func (pc *ProspectController) GetProspect(c *gin.Context) {
 	id := c.Param("id")

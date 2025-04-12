@@ -43,19 +43,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/models.ProspectModel"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -93,13 +93,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -133,19 +139,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/models.UserModel"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -183,13 +189,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.SimpleResponse"
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -197,11 +209,48 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "controllers.SimpleResponse": {
+        "controllers.ErrorResponse": {
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string"
+                "details": {
+                    "description": "Additional details about the error",
+                    "type": "string",
+                    "example": "Invalid input data"
+                },
+                "error": {
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "Bad Request"
+                }
+            }
+        },
+        "controllers.InternalErrorResponse": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "description": "Additional details about the error",
+                    "type": "string",
+                    "example": "Server Error"
+                },
+                "error": {
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "Internal Server Error"
+                }
+            }
+        },
+        "controllers.NotFoundResponse": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "description": "Additional details about the error",
+                    "type": "string",
+                    "example": "No Data found for the input provided"
+                },
+                "error": {
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "No data"
                 }
             }
         },
