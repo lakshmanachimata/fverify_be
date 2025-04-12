@@ -1,7 +1,6 @@
 package main
 
 import (
-	// Import the generated docs package
 	"context"
 	"log"
 
@@ -15,7 +14,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options" // Import the generated docs package
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // @title Kowtha API
@@ -45,10 +44,8 @@ func main() {
 	prospectService := services.NewProspectService(prospectRepo)
 	userService := services.NewUserService(userRepo)
 
-	// Initialize repositories and services
+	// Initialize controllers
 	prospectController := controllers.NewProspectController(prospectService)
-
-	// Initialize repositories and services
 	userController := controllers.NewUserController(userService)
 
 	// Set up Gin router
@@ -63,13 +60,57 @@ func main() {
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	// Swagger endpoint
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// User APIs
+	// @Summary Create a new user
+	// @Description Create a new user in the system
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param user body models.UserModel true "User data"
+	// @Success 201 {object} gin.H{"message": "User created successfully"}
+	// @Failure 400 {object} gin.H{"error": "Bad Request"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /users [post]
 	router.POST("/users", userController.CreateUser)
+
+	// @Summary Get a user by ID
+	// @Description Retrieve a user by their unique ID
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param id path string true "User ID"
+	// @Success 200 {object} models.UserModel
+	// @Failure 400 {object} gin.H{"error": "Invalid user ID"}
+	// @Failure 404 {object} gin.H{"error": "User not found"}
+	// @Router /users/{id} [get]
 	router.GET("/users/:id", userController.GetUserByID)
 
+	// Prospect APIs
+	// @Summary Create a new prospect
+	// @Description Create a new prospect in the system
+	// @Tags Prospects
+	// @Accept json
+	// @Produce json
+	// @Param prospect body models.ProspectModel true "Prospect data"
+	// @Success 201 {object} gin.H{"message": "Prospect created"}
+	// @Failure 400 {object} gin.H{"error": "Bad Request"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /prospects [post]
 	router.POST("/prospects", prospectController.CreateProspect)
+
+	// @Summary Get a prospect by ID
+	// @Description Retrieve a prospect by their unique ID
+	// @Tags Prospects
+	// @Accept json
+	// @Produce json
+	// @Param id path string true "Prospect ID"
+	// @Success 200 {object} models.ProspectModel
+	// @Failure 400 {object} gin.H{"error": "Invalid prospect ID"}
+	// @Failure 404 {object} gin.H{"error": "Prospect not found"}
+	// @Router /prospects/{id} [get]
 	router.GET("/prospects/:id", prospectController.GetProspect)
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start the server
 	if err := router.Run(":9000"); err != nil {
