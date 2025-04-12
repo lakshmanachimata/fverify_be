@@ -1,6 +1,7 @@
 package main
 
 import (
+	// Import the generated docs package
 	"context"
 	"log"
 
@@ -9,8 +10,11 @@ import (
 	"kowtha_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/swag/example/basic/docs"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/options" // Import the generated docs package
 )
 
 func main() {
@@ -43,11 +47,22 @@ func main() {
 	// Set up Gin router
 	router := gin.Default()
 
+	// Swagger setup
+	docs.SwaggerInfo.Title = "Kowtha API"
+	docs.SwaggerInfo.Description = "This is the API documentation for the Kowtha backend."
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
+	// Swagger endpoint
+
 	router.POST("/users", userController.CreateUser)
 	router.GET("/users/:id", userController.GetUserByID)
 
 	router.POST("/prospects", prospectController.CreateProspect)
 	router.GET("/prospects/:id", prospectController.GetProspect)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Start the server
 	if err := router.Run(":9000"); err != nil {
