@@ -1,11 +1,363 @@
 basePath: /
+definitions:
+  controllers.SimpleResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.ProspectModel:
+    description: Prospect model containing all prospect-related information.
+    properties:
+      age:
+        description: Age of the applicant
+        example: 30
+        type: integer
+      applicant_name:
+        description: Name of the applicant
+        example: John Doe
+        type: string
+      colleague_designation:
+        description: Designation of the colleague
+        example: Team Lead
+        type: string
+      colleague_mobile:
+        description: Mobile number of the colleague
+        example: "9876543212"
+        type: string
+      colleague_name:
+        description: Name of a colleague
+        example: Mark Smith
+        type: string
+      emp_id:
+        description: Employee ID
+        example: EMP123
+        type: string
+      employment_type:
+        description: Employment type ("Employee" or "Business")
+        example: Employee
+        type: string
+      gender:
+        description: Gender of the applicant
+        example: Male
+        type: string
+      gross_salary:
+        description: Gross salary
+        example: 50000
+        type: number
+      id:
+        description: Incremental ID
+        example: 1
+        type: integer
+      mobile_number:
+        description: Mobile number of the applicant
+        example: "9876543210"
+        type: string
+      net_salary:
+        description: Net salary
+        example: 40000
+        type: number
+      number_of_family_members:
+        description: Number of family members
+        example: 4
+        type: integer
+      office_address:
+        description: Office address
+        example: 456 Office Street
+        type: string
+      previous_experience:
+        description: Previous experience
+        example: 5 years in sales
+        type: string
+      prospect_id:
+        description: Unique prospect ID
+        example: P12345
+        type: string
+      reference_mobile:
+        description: Mobile number of the reference
+        example: "9876543211"
+        type: string
+      reference_name:
+        description: Reference name
+        example: Jane Doe
+        type: string
+      reference_relation:
+        description: Relation with the reference
+        example: Sister
+        type: string
+      remarks:
+        description: Additional remarks
+        example: Prospect is under review
+        type: string
+      residential_address:
+        description: Residential address
+        example: 123 Main Street
+        type: string
+      role:
+        description: Role in the organization
+        example: Manager
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/models.ProspectStatus'
+        description: Current status of the prospect
+        example: Pending
+      uploaded_images:
+        description: Uploaded images
+        example:
+        - '["image1.jpg"'
+        - ' "image2.jpg"]'
+        items:
+          type: string
+        type: array
+      years_in_current_office:
+        description: Years in the current office
+        example: 3
+        type: integer
+      years_of_stay:
+        description: Years of stay at the current address
+        example: 5
+        type: integer
+    type: object
+  models.ProspectStatus:
+    enum:
+    - Pending
+    - OnVisit
+    - Progress
+    - Approved
+    - Rejected
+    - UnderReview
+    - Completed
+    - Submitted
+    - Cancelled
+    - RePending
+    - Postponed
+    type: string
+    x-enum-varnames:
+    - Pending
+    - OnVisit
+    - Progressve
+    - Approved
+    - Rejected
+    - UnderReview
+    - Completed
+    - Submitted
+    - Cancelled
+    - RePending
+    - Postponed
+  models.Role:
+    enum:
+    - Admin
+    - Operations Lead
+    - Field Lead
+    - Field Executive
+    - Owner
+    - Operations Executive
+    type: string
+    x-enum-varnames:
+    - Admin
+    - OperationsLead
+    - FieldLead
+    - FieldExecutive
+    - Owner
+    - OperationsExecutive
+  models.UpdateHistory:
+    description: History of updates made to a user.
+    properties:
+      updated_comments:
+        description: Comments about the update
+        example: Updated user role
+        type: string
+      updated_time:
+        description: Time of the update
+        example: "2023-04-12T15:04:05Z"
+        type: string
+    type: object
+  models.UserModel:
+    description: User model containing all user-related information.
+    properties:
+      created_time:
+        description: Time when the user was created
+        example: "2023-04-12T15:04:05Z"
+        type: string
+      password:
+        description: Hashed password
+        example: hashed_password
+        type: string
+      remarks:
+        description: Additional remarks about the user
+        example: User is active and verified
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/models.Role'
+        description: Role of the user
+        example: Admin
+      status:
+        allOf:
+        - $ref: '#/definitions/models.UserStatus'
+        description: Status of the user
+        example: Active
+      update_history:
+        description: History of updates
+        items:
+          $ref: '#/definitions/models.UpdateHistory'
+        type: array
+      updated_time:
+        description: Time when the user was last updated
+        example: "2023-04-12T15:04:05Z"
+        type: string
+      user_id:
+        description: Incremental ID
+        example: 1
+        type: integer
+      username:
+        description: Username of the user
+        example: john_doe
+        type: string
+    type: object
+  models.UserStatus:
+    enum:
+    - Created
+    - Confirmed
+    - Verified
+    - Active
+    - Inactive
+    - Disabled
+    - Banned
+    type: string
+    x-enum-varnames:
+    - Created
+    - Confirmed
+    - Verified
+    - Active
+    - InActive
+    - Disabled
+    - Banned
 host: localhost:9000
 info:
   contact: {}
   description: This is the API documentation for the Kowtha backend.
   title: Kowtha API
   version: "1.0"
-paths: {}
+paths:
+  /prospects:
+    post:
+      consumes:
+      - application/json
+      description: Create a new prospect in the system
+      parameters:
+      - description: Prospect data
+        in: body
+        name: prospect
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProspectModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+      summary: Create a new prospect
+      tags:
+      - Prospects
+  /prospects/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a prospect by their unique ID
+      parameters:
+      - description: Prospect ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProspectModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+      summary: Get a prospect by ID
+      tags:
+      - Prospects
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user in the system
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+      summary: Create a new user
+      tags:
+      - Users
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a user by their unique ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.SimpleResponse'
+      summary: Get a user by ID
+      tags:
+      - Users
 schemes:
 - http
 swagger: "2.0"

@@ -18,6 +18,17 @@ func NewUserController(service *services.UserService) *UserController {
 	return &UserController{Service: service}
 }
 
+// CreateUser godoc
+// @Summary Create a new user
+// @Description Create a new user in the system
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body models.UserModel true "User data"
+// @Success 201 {object} SimpleResponse
+// @Failure 400 {object} SimpleResponse
+// @Failure 500 {object} SimpleResponse
+// @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user models.UserModel
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -33,6 +44,17 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
 }
 
+// GetUserByID godoc
+// @Summary Get a user by ID
+// @Description Retrieve a user by their unique ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} models.UserModel
+// @Failure 400 {object} SimpleResponse
+// @Failure 404 {object} SimpleResponse
+// @Router /users/{id} [get]
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 	userID, err := strconv.Atoi(idParam)

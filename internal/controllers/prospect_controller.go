@@ -3,10 +3,15 @@ package controllers
 import (
 	"net/http"
 
+	"kowtha_be/internal/models"
 	"kowtha_be/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
+
+type SimpleResponse struct {
+	Message string `json:"message"`
+}
 
 type ProspectController struct {
 	Service *services.ProspectService
@@ -16,12 +21,50 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 	return &ProspectController{Service: service}
 }
 
+// CreateProspect godoc
+// @Summary Create a new prospect
+// @Description Create a new prospect in the system
+// @Tags Prospects
+// @Accept json
+// @Produce json
+// @Param prospect body models.ProspectModel true "Prospect data"
+// @Success 201 {object} SimpleResponse
+// @Failure 400 {object} SimpleResponse
+// @Failure 500 {object} SimpleResponse
+// @Router /prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
-	// Handle creating a prospect
+	var prospect models.ProspectModel
+	if err := c.ShouldBindJSON(&prospect); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := pc.Service.CreateProspect(c.Request.Context(), &prospect); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create prospect"})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{"message": "Prospect created"})
 }
 
+// GetProspect godoc
+// @Summary Get a prospect by ID
+// @Description Retrieve a prospect by their unique ID
+// @Tags Prospects
+// @Accept json
+// @Produce json
+// @Param id path string true "Prospect ID"
+// @Success 200 {object} models.ProspectModel
+// @Failure 400 {object} SimpleResponse
+// @Failure 404 {object} SimpleResponse
+// @Router /prospects/{id} [get]
 func (pc *ProspectController) GetProspect(c *gin.Context) {
-	// Handle retrieving a prospect
-	c.JSON(http.StatusOK, gin.H{"message": "Prospect retrieved"})
+	id := c.Param("id")
+	prospect, err := pc.Service.GetProspectByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Prospect not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, prospect)
 }
