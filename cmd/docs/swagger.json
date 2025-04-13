@@ -184,6 +184,88 @@
                 }
             }
         },
+        "/users/uid/{uId}": {
+            "delete": {
+                "description": "Delete a user by their unique uId",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by uId",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User uId",
+                        "name": "uId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/userid/{userId}": {
+            "delete": {
+                "description": "Delete a user by their unique userId",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by userId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User userId",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{userId}": {
             "get": {
                 "description": "Retrieve a user by their unique ID",
