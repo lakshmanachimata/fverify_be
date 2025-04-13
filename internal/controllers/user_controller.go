@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"kowtha_be/internal/models"
 	"kowtha_be/internal/services"
@@ -90,4 +91,62 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, users)
+}
+
+// DeleteUserByUId godoc
+// @Summary Delete a user by uId
+// @Description Delete a user by their unique uId
+// @Tags Users
+// @Param uId path int true "User uId"
+// @Success 204 "No Content"
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /users/uid/{uId} [delete]
+func (uc *UserController) DeleteUserByUId(c *gin.Context) {
+	uIdParam := c.Param("uId")
+	uId, err := strconv.Atoi(uIdParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error:   "Invalid uId",
+			Details: "uId must be a valid integer",
+		})
+		return
+	}
+
+	err = uc.Service.DeleteByUId(c.Request.Context(), uId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Error:   "User not found",
+			Details: "No user found with the given uId",
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
+// DeleteUserByUserId godoc
+// @Summary Delete a user by userId
+// @Description Delete a user by their unique userId
+// @Tags Users
+// @Param userId path string true "User userId"
+// @Success 204 "No Content"
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /users/userid/{userId} [delete]
+func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
+	userId := c.Param("userId")
+
+	err := uc.Service.DeleteByUserId(c.Request.Context(), userId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Error:   "User not found",
+			Details: "No user found with the given userId",
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }

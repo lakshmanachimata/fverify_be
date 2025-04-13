@@ -103,6 +103,26 @@ func main() {
 	// @Router /users/{userId} [get]
 	router.GET("/users/:userId", userController.GetUserByUserID)
 
+	// @Summary Delete a user by uId
+	// @Description Delete a user by their unique uId
+	// @Tags Users
+	// @Param uId path int true "User uId"
+	// @Success 204 "No Content"
+	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
+	// @Failure 404 {object} gin.H{"error": "User not found"}
+	// @Router /users/uid/{uId} [delete]
+	router.DELETE("/users/uid/:uId", userController.DeleteUserByUId)
+
+	// @Summary Delete a user by userId
+	// @Description Delete a user by their unique userId
+	// @Tags Users
+	// @Param userId path string true "User userId"
+	// @Success 204 "No Content"
+	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
+	// @Failure 404 {object} gin.H{"error": "User not found"}
+	// @Router /users/userid/{userId} [delete]
+	router.DELETE("/users/userid/:userId", userController.DeleteUserByUserId)
+
 	// Prospect APIs
 	// @Summary Create a new prospect
 	// @Description Create a new prospect in the system

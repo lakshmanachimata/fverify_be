@@ -77,6 +77,10 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel)
 	return err
 }
 
+func (r *UserRepositoryImpl) DeleteByUId(ctx context.Context, uId int) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"uid": uId})
+	return err
+}
 func (r *UserRepositoryImpl) DeleteByUserId(ctx context.Context, userId string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"userid": userId})
 	return err

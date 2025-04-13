@@ -30,3 +30,11 @@ func (s *UserService) GetByUserID(ctx context.Context, userId string) (*models.U
 func (s *UserService) GetAllUsers(ctx context.Context) ([]*models.UserModel, error) {
 	return s.repo.GetAllUsers(ctx)
 }
+
+func (s *UserService) DeleteByUId(ctx context.Context, uId int) error {
+	return s.repo.DeleteByUId(ctx, uId)
+}
+
+func (s *UserService) DeleteByUserId(ctx context.Context, userId string) error {
+	return s.repo.DeleteByUserId(ctx, userId)
+}
