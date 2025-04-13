@@ -38,6 +38,15 @@ func (r *UserRepositoryImpl) getNextUserID(ctx context.Context) (int, error) {
 	return counter.SequenceValue, nil
 }
 
+func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string) (*models.UserModel, error) {
+	var user models.UserModel
+	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
 	// Generate the next unique ID (uId)
 	nextUId, err := r.getNextUserID(ctx)

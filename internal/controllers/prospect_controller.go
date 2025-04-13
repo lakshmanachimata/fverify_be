@@ -9,21 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ErrorResponse struct {
-	Error   string `json:"error" example:"Bad Request"`          // Error message
-	Details string `json:"details" example:"Invalid input data"` // Additional details about the error
-}
-
-type InternalErrorResponse struct {
-	Error   string `json:"error" example:"Internal Server Error"` // Error message
-	Details string `json:"details" example:"Server Error"`        // Additional details about the error
-}
-
-type NotFoundResponse struct {
-	Error   string `json:"error" example:"No data"`                                // Error message
-	Details string `json:"details" example:"No Data found for the input provided"` // Additional details about the error
-}
-
 type ProspectController struct {
 	Service *services.ProspectService
 }

@@ -134,6 +134,12 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -176,6 +182,58 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "Validate username and password, and return user details with a token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login a user",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
                         }
                     },
                     "500": {
@@ -231,16 +289,22 @@ const docTemplate = `{
                             "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -270,10 +334,16 @@ const docTemplate = `{
                             "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
                         }
                     },
                     "500": {
@@ -311,16 +381,22 @@ const docTemplate = `{
                             "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
                         }
                     }
                 }
@@ -359,6 +435,12 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
                         }
                     },
                     "404": {
@@ -408,6 +490,21 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.InvalidAuthResponse": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "description": "Additional details about the error",
+                    "type": "string",
+                    "example": "Invalid user name or password"
+                },
+                "error": {
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "Login Failed"
+                }
+            }
+        },
         "controllers.NotFoundResponse": {
             "type": "object",
             "properties": {
@@ -420,6 +517,67 @@ const docTemplate = `{
                     "description": "Error message",
                     "type": "string",
                     "example": "No data"
+                }
+            }
+        },
+        "models.LoginRequest": {
+            "description": "Login request payload containing username and password.",
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "Password",
+                    "type": "string",
+                    "example": "password"
+                },
+                "username": {
+                    "description": "Username",
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "description": "Login response payload containing user details and the generated token.",
+            "type": "object",
+            "properties": {
+                "mobileNumber": {
+                    "description": "Mobile number",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "role": {
+                    "description": "Role of the user",
+                    "type": "string",
+                    "example": "Admin"
+                },
+                "status": {
+                    "description": "Status of the user",
+                    "type": "string",
+                    "example": "Active"
+                },
+                "token": {
+                    "description": "Auth token",
+                    "type": "string",
+                    "example": "\u003cjwt_token\u003e"
+                },
+                "uid": {
+                    "description": "User's unique ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "userId": {
+                    "description": "User's unique identifier",
+                    "type": "string",
+                    "example": "12345"
+                },
+                "username": {
+                    "description": "Username",
+                    "type": "string",
+                    "example": "john_doe"
                 }
             }
         },

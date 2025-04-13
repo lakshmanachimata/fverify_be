@@ -70,3 +70,37 @@ type UserModel struct {
 	Remarks       string          `bson:"remarks" json:"remarks" example:"User is active and verified"`    // Additional remarks about the user
 	MobileNumber  string          `bson:"mobile_number" json:"mobile_number" example:"9876543210"`         // Mobile number of the user
 }
+
+// LoginRequest represents the request payload for the login API.
+// @Description Login request payload containing username and password.
+//
+//	@Example {
+//	  "username": "john_doe",
+//	  "password": "password"
+//	}
+type LoginRequest struct {
+	Username string `json:"username" binding:"required" example:"john_doe"` // Username
+	Password string `json:"password" binding:"required" example:"password"` // Password
+}
+
+// LoginResponse represents the response payload for the login API.
+// @Description Login response payload containing user details and the generated token.
+//
+//	@Example {
+//	  "uid": 1,
+//	  "userId": "12345",
+//	  "username": "john_doe",
+//	  "role": "Admin",
+//	  "status": "Active",
+//	  "mobileNumber": "9876543210",
+//	  "token": "<jwt_token>"
+//	}
+type LoginResponse struct {
+	UId          int    `json:"uid" example:"1"`                   // User's unique ID
+	UserId       string `json:"userId" example:"12345"`            // User's unique identifier
+	Username     string `json:"username" example:"john_doe"`       // Username
+	Role         string `json:"role" example:"Admin"`              // Role of the user
+	Status       string `json:"status" example:"Active"`           // Status of the user
+	MobileNumber string `json:"mobileNumber" example:"9876543210"` // Mobile number
+	Token        string `json:"token" example:"<jwt_token>"`       // Auth token
+}
