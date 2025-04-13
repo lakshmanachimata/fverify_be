@@ -81,17 +81,27 @@ func main() {
 	// @Router /users [post]
 	router.POST("/users", userController.CreateUser)
 
+	// @Summary Get all users
+	// @Description Retrieve all users in the system
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Success 200 {array} models.UserModel
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /users [get]
+	router.GET("/users", userController.GetAllUsers)
+
 	// @Summary Get a user by ID
 	// @Description Retrieve a user by their unique ID
 	// @Tags Users
 	// @Accept json
 	// @Produce json
-	// @Param id path string true "User ID"
+	// @Param userId path string true "User ID"
 	// @Success 200 {object} models.UserModel
 	// @Failure 400 {object} gin.H{"error": "Invalid user ID"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
-	// @Router /users/{id} [get]
-	router.GET("/users/:id", userController.GetUserByID)
+	// @Router /users/{userId} [get]
+	router.GET("/users/:userId", userController.GetUserByUserID)
 
 	// Prospect APIs
 	// @Summary Create a new prospect

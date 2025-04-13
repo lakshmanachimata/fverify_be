@@ -40,7 +40,7 @@ type UpdateHistory struct {
 // @Description User model containing all user-related information.
 //
 //	@Example {
-//	  "user_id": 1,
+//	  "userid": "12345",
 //	  "username": "john_doe",
 //	  "password": "hashed_password",
 //	  "role": "Admin",
@@ -56,7 +56,8 @@ type UpdateHistory struct {
 //	  "remarks": "User is active and verified"
 //	}
 type UserModel struct {
-	ID            int             `bson:"user_id" json:"user_id" example:"1"`                              // Incremental ID
+	UId           int             `bson:"uid" json:"uid" example:"1"`                                      // Auto-incremented unique identifier
+	UserId        string          `bson:"userid" json:"userid" example:"112345"`                           // Unique identifier for the user
 	Username      string          `bson:"username" json:"username" example:"john_doe"`                     // Username of the user
 	Password      string          `bson:"password" json:"password" example:"hashed_password"`              // Hashed password
 	Role          Role            `bson:"role" json:"role" example:"Admin"`                                // Role of the user

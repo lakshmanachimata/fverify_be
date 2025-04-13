@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type UserRepositoryImpl struct {
@@ -18,9 +19,37 @@ func NewUserRepository(client *mongo.Client, dbName, collectionName string) *Use
 	return &UserRepositoryImpl{collection: collection}
 }
 
+func (r *UserRepositoryImpl) getNextUserID(ctx context.Context) (int, error) {
+	counter := struct {
+		SequenceValue int `bson:"sequence_value"`
+	}{}
+
+	filter := bson.M{"_id": "user_uid"}                                 // Counter identifier for uId
+	update := bson.M{"$inc": bson.M{"sequence_value": 1}}               // Increment the counter
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After) // Return the updated document
+
+	// Increment the counter and retrieve the updated value
+	err := r.collection.Database().Collection("counters").FindOneAndUpdate(ctx, filter, update, opts).Decode(&counter)
+	if err != nil {
+		return 0, err
+	}
+
+	return counter.SequenceValue, nil
+}
+
 func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
+	// Generate the next unique ID (uId)
+	nextUId, err := r.getNextUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	user.UId = nextUId // Set the auto-incremented uId
+
+	// Set CreatedTime and UpdatedTime
 	user.CreatedTime = time.Now()
 	user.UpdatedTime = time.Now()
+
+	// Insert the user into the collection
 	result, err := r.collection.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
@@ -36,24 +65,24 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 	return &createdUser, nil
 }
 
-func (r *UserRepositoryImpl) GetByID(ctx context.Context, id int) (*models.UserModel, error) {
+func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserModel, error) {
 	var user models.UserModel
-	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&user)
+	err := r.collection.FindOne(ctx, bson.M{"userid": userId}).Decode(&user)
 	return &user, err
 }
 
 func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel) error {
 	user.UpdatedTime = time.Now()
-	_, err := r.collection.UpdateOne(ctx, bson.M{"id": user.ID}, bson.M{"$set": user})
+	_, err := r.collection.UpdateOne(ctx, bson.M{"userid": user.UserId}, bson.M{"$set": user})
 	return err
 }
 
-func (r *UserRepositoryImpl) Delete(ctx context.Context, id string) error {
-	_, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
+func (r *UserRepositoryImpl) DeleteByUserId(ctx context.Context, userId string) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"userid": userId})
 	return err
 }
 
-func (r *UserRepositoryImpl) FindAll(ctx context.Context) ([]*models.UserModel, error) {
+func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserModel, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err

@@ -112,6 +112,36 @@ const docTemplate = `{
             }
         },
         "/users": {
+            "get": {
+                "description": "Retrieve all users in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new user in the system",
                 "consumes": [
@@ -157,7 +187,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{id}": {
+        "/users/{userId}": {
             "get": {
                 "description": "Retrieve a user by their unique ID",
                 "consumes": [
@@ -169,12 +199,12 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Get a user by ID",
+                "summary": "Get a user by userId",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "User ID",
-                        "name": "id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -501,6 +531,11 @@ const docTemplate = `{
                     ],
                     "example": "Active"
                 },
+                "uid": {
+                    "description": "Auto-incremented unique identifier",
+                    "type": "integer",
+                    "example": 1
+                },
                 "update_history": {
                     "description": "History of updates",
                     "type": "array",
@@ -513,10 +548,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2023-04-12T15:04:05Z"
                 },
-                "user_id": {
-                    "description": "Incremental ID",
-                    "type": "integer",
-                    "example": 1
+                "userid": {
+                    "description": "Unique identifier for the user",
+                    "type": "string",
+                    "example": "112345"
                 },
                 "username": {
                     "description": "Username of the user",

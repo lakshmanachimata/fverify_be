@@ -225,6 +225,10 @@ definitions:
         - $ref: '#/definitions/models.UserStatus'
         description: Status of the user
         example: Active
+      uid:
+        description: Auto-incremented unique identifier
+        example: 1
+        type: integer
       update_history:
         description: History of updates
         items:
@@ -234,10 +238,10 @@ definitions:
         description: Time when the user was last updated
         example: "2023-04-12T15:04:05Z"
         type: string
-      user_id:
-        description: Incremental ID
-        example: 1
-        type: integer
+      userid:
+        description: Unique identifier for the user
+        example: "112345"
+        type: string
       username:
         description: Username of the user
         example: john_doe
@@ -332,6 +336,26 @@ paths:
       tags:
       - Prospects
   /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserModel'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      summary: Get all users
+      tags:
+      - Users
     post:
       consumes:
       - application/json
@@ -361,7 +385,7 @@ paths:
       summary: Create a new user
       tags:
       - Users
-  /users/{id}:
+  /users/{userId}:
     get:
       consumes:
       - application/json
@@ -369,7 +393,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: id
+        name: userId
         required: true
         type: integer
       produces:
@@ -391,7 +415,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
-      summary: Get a user by ID
+      summary: Get a user by userId
       tags:
       - Users
 schemes:

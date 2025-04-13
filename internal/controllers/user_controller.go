@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"kowtha_be/internal/models"
 	"kowtha_be/internal/services"
@@ -36,41 +35,59 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
+	// Ensure uId is not set by the payload
+	user.UId = 0
+
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
 
-	// Return the created user model in the response
 	c.JSON(http.StatusCreated, createdUser)
 }
 
-// GetUserByID godoc
-// @Summary Get a user by ID
+// GetByUserID godoc
+// @Summary Get a user by userId
 // @Description Retrieve a user by their unique ID
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param id path int true "User ID"
+// @Param userId path int true "User ID"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/{id} [get]
-func (uc *UserController) GetUserByID(c *gin.Context) {
-	idParam := c.Param("id")
-	userID, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-
-	user, err := uc.Service.GetUserByID(c.Request.Context(), userID)
+// @Router /users/{userId} [get]
+func (uc *UserController) GetUserByUserID(c *gin.Context) {
+	idParam := c.Param("userId")
+	user, err := uc.Service.GetByUserID(c.Request.Context(), idParam)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+// GetAllUsers godoc
+// @Summary Get all users
+// @Description Retrieve all users in the system
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.UserModel
+// @Failure 500 {object} ErrorResponse
+// @Router /users [get]
+func (uc *UserController) GetAllUsers(c *gin.Context) {
+	users, err := uc.Service.GetAllUsers(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error:   "Internal Server Error",
+			Details: "Failed to retrieve users",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
