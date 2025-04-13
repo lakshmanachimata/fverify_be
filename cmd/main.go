@@ -4,13 +4,12 @@ import (
 	"context"
 	"log"
 
+	"kowtha_be/internal/auth"
 	"kowtha_be/internal/controllers"
 	"kowtha_be/internal/repositories"
 	"kowtha_be/internal/services"
 
 	"kowtha_be/cmd/docs"
-
-	"kowtha_be/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -86,6 +85,7 @@ func main() {
 	// @Summary Create a new user
 	// @Description Create a new user in the system
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Accept json
 	// @Produce json
 	// @Param user body models.UserModel true "User data"
@@ -93,11 +93,12 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users [post]
-	router.POST("/users", middleware.AuthMiddleware("Admin", "Owner"), userController.CreateUser)
+	router.POST("/users", auth.AuthMiddleware("Admin", "Owner"), userController.CreateUser)
 
 	// @Summary Update a user
 	// @Description Update an existing user's details
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Accept json
 	// @Produce json
 	// @Param uId path int true "User uId"
@@ -107,21 +108,23 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/uid/{uId} [put]
-	router.PUT("/users/uid/:uId", middleware.AuthMiddleware("Admin", "Owner", "Operations Lead"), userController.UpdateUser)
+	router.PUT("/users/uid/:uId", auth.AuthMiddleware("Admin", "Owner", "Operations Lead"), userController.UpdateUser)
 
 	// @Summary Get all users
 	// @Description Retrieve all users in the system
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Accept json
 	// @Produce json
 	// @Success 200 {array} models.UserModel
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users [get]
-	router.GET("/users", middleware.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetAllUsers)
+	router.GET("/users", auth.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetAllUsers)
 
 	// @Summary Get a user by ID
 	// @Description Retrieve a user by their unique ID
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Accept json
 	// @Produce json
 	// @Param userId path string true "User ID"
@@ -129,27 +132,29 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid user ID"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/{userId} [get]
-	router.GET("/users/:userId", middleware.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetUserByUserID)
+	router.GET("/users/:userId", auth.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetUserByUserID)
 
 	// @Summary Delete a user by uId
 	// @Description Delete a user by their unique uId
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Param uId path int true "User uId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/uid/{uId} [delete]
-	router.DELETE("/users/uid/:uId", middleware.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUId)
+	router.DELETE("/users/uid/:uId", auth.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUId)
 
 	// @Summary Delete a user by userId
 	// @Description Delete a user by their unique userId
 	// @Tags Users
+	// @Param Authorization header string true "Bearer token"
 	// @Param userId path string true "User userId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/userid/{userId} [delete]
-	router.DELETE("/users/userid/:userId", middleware.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUserId)
+	router.DELETE("/users/userid/:userId", auth.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUserId)
 	// Prospect APIs
 	// @Summary Create a new prospect
 	// @Description Create a new prospect in the system

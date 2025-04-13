@@ -45,6 +45,7 @@ func NewUserController(service *services.UserService) *UserController {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param user body models.UserModel true "User data"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -76,6 +77,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param userId path int true "User ID"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -100,6 +102,7 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Success 200 {array} models.UserModel
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
@@ -122,6 +125,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Description Delete a user by their unique uId
 // @Tags Users
 // @Param uId path int true "User uId"
+// @Param Authorization header string true "Bearer token"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
@@ -156,6 +160,7 @@ func (uc *UserController) DeleteUserByUId(c *gin.Context) {
 // @Description Delete a user by their unique userId
 // @Tags Users
 // @Param userId path string true "User userId"
+// @Param Authorization header string true "Bearer token"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
@@ -183,6 +188,7 @@ func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param uId path int true "User uId"
 // @Param user body models.UserModel true "Updated user data"
 // @Success 200 {object} models.UserModel

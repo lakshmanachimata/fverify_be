@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"kowtha_be/internal/utils"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +20,7 @@ func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 		// Parse and validate the token
-		claims, err := utils.ParseAuthToken(tokenString)
+		claims, err := ParseAuthToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			c.Abort()
