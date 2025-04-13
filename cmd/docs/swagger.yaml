@@ -22,6 +22,17 @@ definitions:
         example: Internal Server Error
         type: string
     type: object
+  controllers.InvalidAPIKeyResponse:
+    properties:
+      details:
+        description: Additional details about the error
+        example: API key is invalid
+        type: string
+      error:
+        description: Error message
+        example: Invalid API key
+        type: string
+    type: object
   controllers.InvalidAuthResponse:
     properties:
       details:
@@ -44,9 +55,20 @@ definitions:
         example: No data
         type: string
     type: object
+  controllers.SuccessResponse:
+    properties:
+      message:
+        description: Success message
+        example: User created successfully
+        type: string
+    type: object
   models.LoginRequest:
     description: Login request payload containing username and password.
     properties:
+      orgId:
+        description: Organization ID
+        example: "123456"
+        type: string
       password:
         description: Password
         example: password
@@ -56,6 +78,7 @@ definitions:
         example: john_doe
         type: string
     required:
+    - orgId
     - password
     - username
     type: object
@@ -92,6 +115,36 @@ definitions:
         example: john_doe
         type: string
     type: object
+  models.Organisation:
+    properties:
+      orgId:
+        description: Organisation ID
+        example: "12345"
+        type: string
+      orgName:
+        description: Organisation Name
+        example: Acme Corp
+        type: string
+      orgUUID:
+        description: Auto-generated UUID
+        example: uuid-v4
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/models.OrganisationStatus'
+        description: Organisation Status
+        example: Active
+    type: object
+  models.OrganisationStatus:
+    enum:
+    - Created
+    - Active
+    - InActive
+    type: string
+    x-enum-varnames:
+    - OrgCreated
+    - OrgActive
+    - OrgInActive
   models.ProspectModel:
     description: Prospect model containing all prospect-related information.
     properties:
@@ -247,6 +300,15 @@ definitions:
     - FieldExecutive
     - Owner
     - OperationsExecutive
+  models.SetPasswordRequest:
+    properties:
+      password:
+        description: New password
+        example: new_password
+        type: string
+    required:
+    - password
+    type: object
   models.UpdateHistory:
     description: History of updates made to a user.
     properties:
@@ -273,6 +335,10 @@ definitions:
       mobile_number:
         description: Mobile number of the user
         example: "9876543210"
+        type: string
+      orgId:
+        description: Organization ID
+        example: "123456"
         type: string
       password:
         description: Hashed password
@@ -339,6 +405,238 @@ info:
   title: Kowtha API
   version: "1.0"
 paths:
+  /admin/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin user in the system (requires API key)
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Admin user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Create a new admin user
+      tags:
+      - Users
+  /organisations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all organisations in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Organisation'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Get all organisations
+      tags:
+      - Organisations
+    post:
+      consumes:
+      - application/json
+      description: Create a new organisation in the system
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Organisation data
+        in: body
+        name: organisation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organisation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Organisation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Create a new organisation
+      tags:
+      - Organisations
+  /organisations/{orgId}:
+    delete:
+      description: Delete an organisation by its ID
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Organisation ID
+        in: path
+        name: orgId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Delete an organisation
+      tags:
+      - Organisations
+    put:
+      consumes:
+      - application/json
+      description: Update an existing organisation's details
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Organisation ID
+        in: path
+        name: orgId
+        required: true
+        type: string
+      - description: Updated organisation data
+        in: body
+        name: organisation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organisation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Organisation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Update an organisation
+      tags:
+      - Organisations
+  /owner/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin user in the system (requires API key)
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Admin user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Create a new owner
+      tags:
+      - Users
   /prospects:
     post:
       consumes:
@@ -625,6 +923,58 @@ paths:
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Update a user
+      tags:
+      - Users
+  /users/uid/{uId}/setpassword:
+    put:
+      consumes:
+      - application/json
+      description: Set a new password for a user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User uId
+        in: path
+        name: uId
+        required: true
+        type: integer
+      - description: New password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAuthResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Set a user's password
       tags:
       - Users
   /users/userid/{userId}:

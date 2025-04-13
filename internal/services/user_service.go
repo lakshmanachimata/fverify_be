@@ -24,6 +24,10 @@ func (s *UserService) CreateUser(ctx context.Context, user *models.UserModel) (*
 	return s.repo.Create(ctx, user)
 }
 
+func (s *UserService) GetByUserUID(ctx context.Context, uid int) (*models.UserModel, error) {
+	return s.repo.GetByUserUID(ctx, uid)
+}
+
 func (s *UserService) GetByUserID(ctx context.Context, userId string) (*models.UserModel, error) {
 	return s.repo.GetByUserID(ctx, userId)
 }
@@ -42,6 +46,9 @@ func (s *UserService) DeleteByUserId(ctx context.Context, userId string) error {
 func (s *UserService) UpdateUser(ctx context.Context, user *models.UserModel) error {
 	return s.repo.Update(ctx, user)
 }
-func (s *UserService) LoginUser(ctx context.Context, username, password string) (*models.UserModel, error) {
-	return s.repo.ValidateUser(ctx, username, password)
+func (s *UserService) LoginUser(ctx context.Context, username, password string, orgId string) (*models.UserModel, error) {
+	return s.repo.ValidateUser(ctx, username, password, orgId)
+}
+func (s *UserService) SetPassword(ctx context.Context, uId int, newPassword string) error {
+	return s.repo.SetPassword(ctx, uId, newPassword)
 }

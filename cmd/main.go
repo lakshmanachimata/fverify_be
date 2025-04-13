@@ -46,14 +46,17 @@ func main() {
 	// Initialize repositories
 	prospectRepo := repositories.NewProspectRepository(client, "kowtha_db", "prospects")
 	userRepo := repositories.NewUserRepository(client, "kowtha_db", "users")
+	orgRepo := repositories.NewOrganisationRepository(client, "kowtha_db", "orgs")
 
 	// Initialize services
 	prospectService := services.NewProspectService(prospectRepo)
 	userService := services.NewUserService(userRepo)
+	orgService := services.NewOrganisationService(orgRepo)
 
 	// Initialize controllers
 	prospectController := controllers.NewProspectController(prospectService)
 	userController := controllers.NewUserController(userService)
+	organisationController := controllers.NewOrganisationController(orgService)
 
 	// Set up Gin router
 	router := gin.Default()
@@ -68,6 +71,56 @@ func main() {
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// @Summary Create a new organisation
+	// @Description Create a new organisation in the system
+	// @Tags Organisations
+	// @Accept json
+	// @Produce json
+	// @Param X-API-Key header string true "API key"
+	// @Param organisation body models.Organisation true "Organisation data"
+	// @Success 201 {object} models.Organisation
+	// @Failure 400 {object} gin.H{"error": "Invalid input"}
+	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /organisations [post]
+	router.POST("/organisations", auth.OrgAPIKeyMiddleware(), organisationController.CreateOrganisation)
+	// @Summary Update an organisation
+	// @Description Update an existing organisation's details
+	// @Tags Organisations
+	// @Accept json
+	// @Produce json
+	// @Param X-API-Key header string true "API key"
+	// @Param orgId path string true "Organisation ID"
+	// @Param organisation body models.Organisation true "Updated organisation data"
+	// @Success 200 {object} models.Organisation
+	// @Failure 400 {object} gin.H{"error": "Invalid input"}
+	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// @Failure 404 {object} gin.H{"error": "Organisation not found"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /organisations/{orgId} [put]
+	router.PUT("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.UpdateOrganisation)
+	// @Summary Delete an organisation
+	// @Description Delete an organisation by its ID
+	// @Tags Organisations
+	// @Param X-API-Key header string true "API key"
+	// @Param orgId path string true "Organisation ID"
+	// @Success 204 "No Content"
+	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// @Failure 404 {object} gin.H{"error": "Organisation not found"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /organisations/{orgId} [delete]
+	router.DELETE("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
+
+	// @Summary Get all organisations
+	// @Description Retrieve all organisations in the system
+	// @Tags Organisations
+	// @Accept json
+	// @Produce json
+	// @Success 200 {array} models.Organisation
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /organisations [get]
+	router.GET("/organisations", auth.GetOrgAPIKeyMiddleware(), organisationController.GetAllOrganisations)
 
 	// @Summary Login a user
 	// @Description Validate username and password, and return user details with a token
@@ -155,6 +208,51 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/userid/{userId} [delete]
 	router.DELETE("/users/userid/:userId", auth.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUserId)
+
+	// @Summary Set a user's password
+	// @Description Set a new password for a user
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param Authorization header string true "Bearer token"
+	// @Param uId path int true "User uId"
+	// @Param password body models.SetPasswordRequest true "New password"
+	// @Success 200 {object} gin.H{"message": "Password updated successfully"}
+	// @Failure 400 {object} gin.H{"error": "Invalid input"}
+	// @Failure 403 {object} gin.H{"error": "Access denied"}
+	// @Failure 404 {object} gin.H{"error": "User not found"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /users/uid/{uId}/setpassword [put]
+	router.PUT("/users/uid/:uId/setpassword", auth.AuthMiddleware("Admin", "Owner", "Operations Lead"), userController.SetPassword)
+
+	// @Summary Create a new admin user
+	// @Description Create a new admin user in the system (requires API key)
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param X-API-Key header string true "API key"
+	// @Param user body models.UserModel true "Admin user data"
+	// @Success 201 {object} models.UserModel
+	// @Failure 400 {object} gin.H{"error": "Invalid input"}
+	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /admin/create [post]
+	router.POST("/users/admin/create", auth.APIKeyMiddleware(), userController.CreateAdmin)
+
+	// @Summary Create a new owner
+	// @Description Create a new admin user in the system (requires API key)
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param X-API-Key header string true "API key"
+	// @Param user body models.UserModel true "Admin user data"
+	// @Success 201 {object} models.UserModel
+	// @Failure 400 {object} gin.H{"error": "Invalid input"}
+	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /admin/create [post]
+	router.POST("/users/owner/create", auth.APIKeyMiddleware(), userController.CreateOwner)
+
 	// Prospect APIs
 	// @Summary Create a new prospect
 	// @Description Create a new prospect in the system

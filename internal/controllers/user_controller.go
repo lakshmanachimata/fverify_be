@@ -35,6 +35,15 @@ type InvalidAuthResponse struct {
 	Details string `json:"details" example:"Invalid user name or password"` // Additional details about the error
 }
 
+type SuccessResponse struct {
+	Message string `json:"message" example:"User created successfully"` // Success message
+}
+
+type InvalidAPIKeyResponse struct {
+	Error   string `json:"error" example:"Invalid API key"`      // Error message
+	Details string `json:"details" example:"API key is invalid"` // Additional details about the error
+}
+
 func NewUserController(service *services.UserService) *UserController {
 	return &UserController{Service: service}
 }
@@ -250,15 +259,20 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		return
 	}
 
+	hashedPassword, err := auth.HashPassword(loginRequest.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+	}
+
 	// Validate the user
-	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password)
+	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, hashedPassword, loginRequest.OrgId)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	// Generate the token
-	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber)
+	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber, user.OrgId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -274,4 +288,141 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		MobileNumber: user.MobileNumber,
 		Token:        token,
 	})
+}
+
+// SetPassword godoc
+// @Summary Set a user's password
+// @Description Set a new password for a user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param uId path int true "User uId"
+// @Param password body models.SetPasswordRequest true "New password"
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} NotFoundResponse
+// @Failure 401 {object} InvalidAuthResponse
+// @Failure 500 {object} InternalErrorResponse
+// @Router /users/uid/{uId}/setpassword [put]
+func (uc *UserController) SetPassword(c *gin.Context) {
+	claims, _ := c.Get("user")
+	authUser := claims.(*auth.AuthTokenClaims)
+
+	uIdParam := c.Param("uId")
+	uId, err := strconv.Atoi(uIdParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid uId"})
+		return
+	}
+
+	var request models.SetPasswordRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Fetch the target user to validate roles
+	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Role-based access control
+	if authUser.Role == string(models.Admin) || authUser.Role == string(models.Owner) {
+		if targetUser.Role != models.Admin && targetUser.Role != models.OperationsLead {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins and Owners can only set passwords for Admins and Operations Leads"})
+			return
+		}
+	} else if authUser.Role == string(models.OperationsLead) {
+		if targetUser.Role != models.OperationsLead && targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive && targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only set passwords for specific roles"})
+			return
+		}
+	} else {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
+	// Update the password
+	err = uc.Service.SetPassword(c.Request.Context(), uId, request.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+}
+
+// CreateAdminUser godoc
+// @Summary Create a new admin user
+// @Description Create a new admin user in the system (requires API key)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param X-API-Key header string true "API key"
+// @Param user body models.UserModel true "Admin user data"
+// @Success 201 {object} models.UserModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} InternalErrorResponse
+// @Router /admin/create [post]
+func (uc *UserController) CreateAdmin(c *gin.Context) {
+	var user models.UserModel
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Ensure the role is set to Admin
+	user.Role = models.Admin
+
+	// Ensure uId is not set by the payload
+	user.UId = 0
+
+	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create admin user"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdUser)
+}
+
+// CreateAdminUser godoc
+// @Summary Create a new owner
+// @Description Create a new admin user in the system (requires API key)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param X-API-Key header string true "API key"
+// @Param user body models.UserModel true "Admin user data"
+// @Success 201 {object} models.UserModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} InternalErrorResponse
+// @Router /owner/create [post]
+func (uc *UserController) CreateOwner(c *gin.Context) {
+	var user models.UserModel
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Ensure the role is set to Admin
+	user.Role = models.Owner
+
+	// Ensure uId is not set by the payload
+	user.UId = 0
+
+	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create admin user"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdUser)
 }

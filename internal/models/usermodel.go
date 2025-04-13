@@ -55,7 +55,8 @@ type UpdateHistory struct {
 //		      "updated_time": "2023-04-12T15:04:05Z"
 //		    }
 //		  ],
-//		  "remarks": "User is active and verified"
+//		  "remarks": "User is active and verified",
+//		  "orgId": "123456"
 //		}
 type UserModel struct {
 	UId           int             `bson:"uid" json:"uid" example:"1"`                                      // Auto-incremented unique identifier
@@ -69,6 +70,7 @@ type UserModel struct {
 	UpdateHistory []UpdateHistory `bson:"update_history" json:"update_history"`                            // History of updates
 	Remarks       string          `bson:"remarks" json:"remarks" example:"User is active and verified"`    // Additional remarks about the user
 	MobileNumber  string          `bson:"mobile_number" json:"mobile_number" example:"9876543210"`         // Mobile number of the user
+	OrgId         string          `bson:"orgId" json:"orgId" example:"123456"`                             // Organization ID
 }
 
 // LoginRequest represents the request payload for the login API.
@@ -81,6 +83,7 @@ type UserModel struct {
 type LoginRequest struct {
 	Username string `json:"username" binding:"required" example:"john_doe"` // Username
 	Password string `json:"password" binding:"required" example:"password"` // Password
+	OrgId    string `json:"orgId" binding:"required" example:"123456"`      // Organization ID
 }
 
 // LoginResponse represents the response payload for the login API.
@@ -103,4 +106,8 @@ type LoginResponse struct {
 	Status       string `json:"status" example:"Active"`           // Status of the user
 	MobileNumber string `json:"mobileNumber" example:"9876543210"` // Mobile number
 	Token        string `json:"token" example:"<jwt_token>"`       // Auth token
+}
+
+type SetPasswordRequest struct {
+	Password string `json:"password" binding:"required" example:"new_password"` // New password
 }

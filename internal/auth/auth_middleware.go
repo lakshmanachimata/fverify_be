@@ -41,3 +41,46 @@ func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
 		c.Abort()
 	}
 }
+
+const apiKey = "059d987b-5f42-44df-a13c-f7042fca0bb1"       // Replace with a secure API key
+const orgAPIKey = "059d987b-5f42-44df-a13c-f7042fca0bb2"    // Replace with a secure API key
+const getOrgAPIKey = "059d987b-5f42-44df-a13c-f7042fca0bb3" // Replace with a secure API key
+
+func APIKeyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the API key from the header
+		providedKey := c.GetHeader("X-API-Key")
+		if providedKey != apiKey {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid API key"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+func OrgAPIKeyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the API key from the header
+		providedKey := c.GetHeader("X-API-Key")
+		if providedKey != orgAPIKey {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid API key"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+func GetOrgAPIKeyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the API key from the header
+		providedKey := c.GetHeader("X-API-Key")
+		if providedKey != getOrgAPIKey {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid API key"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}

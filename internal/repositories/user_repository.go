@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"kowtha_be/internal/auth"
 	"kowtha_be/internal/models"
 	"strings"
 	"time"
@@ -38,13 +39,29 @@ func (r *UserRepositoryImpl) getNextUserID(ctx context.Context) (int, error) {
 	return counter.SequenceValue, nil
 }
 
-func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string) (*models.UserModel, error) {
+func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgId string) (*models.UserModel, error) {
 	var user models.UserModel
-	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password}).Decode(&user)
+	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password, "orgid": orgId}).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId int, newPassword string) error {
+	// Hash the new password
+	hashedPassword, err := auth.HashPassword(newPassword)
+	if err != nil {
+		return err
+	}
+
+	// Update the password for the user with the given uId
+	_, err = r.collection.UpdateOne(
+		ctx,
+		bson.M{"uid": uId}, // Filter by uId
+		bson.M{"$set": bson.M{"password": hashedPassword}}, // Update the password field
+	)
+	return err
 }
 
 func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
@@ -54,6 +71,13 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 		return nil, err
 	}
 	user.UId = nextUId // Set the auto-incremented uId
+
+	// Hash the password
+	hashedPassword, err := auth.HashPassword(user.Password)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = hashedPassword // Set the hashed password
 
 	// Set CreatedTime and UpdatedTime
 	user.CreatedTime = time.Now()
@@ -78,6 +102,12 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserModel, error) {
 	var user models.UserModel
 	err := r.collection.FindOne(ctx, bson.M{"userid": userId}).Decode(&user)
+	return &user, err
+}
+
+func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid int) (*models.UserModel, error) {
+	var user models.UserModel
+	err := r.collection.FindOne(ctx, bson.M{"uid": uid}).Decode(&user)
 	return &user, err
 }
 
