@@ -185,6 +185,63 @@
             }
         },
         "/users/uid/{uId}": {
+            "put": {
+                "description": "Update an existing user's details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User uId",
+                        "name": "uId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated user data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete a user by their unique uId",
                 "tags": [
@@ -561,6 +618,11 @@
             "description": "History of updates made to a user.",
             "type": "object",
             "properties": {
+                "update_by": {
+                    "description": "User who made the update",
+                    "type": "string",
+                    "example": "admin"
+                },
                 "updated_comments": {
                     "description": "Comments about the update",
                     "type": "string",
@@ -581,6 +643,11 @@
                     "description": "Time when the user was created",
                     "type": "string",
                     "example": "2023-04-12T15:04:05Z"
+                },
+                "mobile_number": {
+                    "description": "Mobile number of the user",
+                    "type": "string",
+                    "example": "9876543210"
                 },
                 "password": {
                     "description": "Hashed password",

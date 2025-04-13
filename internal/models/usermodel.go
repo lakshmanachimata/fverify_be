@@ -34,27 +34,29 @@ const (
 type UpdateHistory struct {
 	UpdatedComments string    `bson:"updated_comments" json:"updated_comments" example:"Updated user role"` // Comments about the update
 	UpdatedTime     time.Time `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`      // Time of the update
+	UpdateBy        string    `bson:"update_by" json:"update_by" example:"admin"`                           // User who made the update
 }
 
 // UserModel represents a user in the system.
 // @Description User model containing all user-related information.
 //
-//	@Example {
-//	  "userid": "12345",
-//	  "username": "john_doe",
-//	  "password": "hashed_password",
-//	  "role": "Admin",
-//	  "status": "Active",
-//	  "created_time": "2023-04-12T15:04:05Z",
-//	  "updated_time": "2023-04-12T15:04:05Z",
-//	  "update_history": [
-//	    {
-//	      "updated_comments": "Updated user role",
-//	      "updated_time": "2023-04-12T15:04:05Z"
-//	    }
-//	  ],
-//	  "remarks": "User is active and verified"
-//	}
+//		@Example {
+//		  "userid": "12345",
+//		  "username": "john_doe",
+//		  "password": "hashed_password",
+//		  "role": "Admin",
+//		  "status": "Active",
+//		  "created_time": "2023-04-12T15:04:05Z",
+//		  "updated_time": "2023-04-12T15:04:05Z",
+//	   	  "mobile_number": "9876543210",
+//		  "update_history": [
+//		    {
+//		      "updated_comments": "Updated user role",
+//		      "updated_time": "2023-04-12T15:04:05Z"
+//		    }
+//		  ],
+//		  "remarks": "User is active and verified"
+//		}
 type UserModel struct {
 	UId           int             `bson:"uid" json:"uid" example:"1"`                                      // Auto-incremented unique identifier
 	UserId        string          `bson:"userid" json:"userid" example:"112345"`                           // Unique identifier for the user
@@ -66,4 +68,5 @@ type UserModel struct {
 	UpdatedTime   time.Time       `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"` // Time when the user was last updated
 	UpdateHistory []UpdateHistory `bson:"update_history" json:"update_history"`                            // History of updates
 	Remarks       string          `bson:"remarks" json:"remarks" example:"User is active and verified"`    // Additional remarks about the user
+	MobileNumber  string          `bson:"mobile_number" json:"mobile_number" example:"9876543210"`         // Mobile number of the user
 }

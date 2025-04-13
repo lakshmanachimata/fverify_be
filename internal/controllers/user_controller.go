@@ -8,6 +8,7 @@ import (
 	"kowtha_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserController struct {
@@ -149,4 +150,59 @@ func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+// UpdateUser godoc
+// @Summary Update a user
+// @Description Update an existing user's details
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param uId path int true "User uId"
+// @Param user body models.UserModel true "Updated user data"
+// @Success 200 {object} models.UserModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /users/uid/{uId} [put]
+func (uc *UserController) UpdateUser(c *gin.Context) {
+	uIdParam := c.Param("uId")
+	uId, err := strconv.Atoi(uIdParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error:   "Invalid uId",
+			Details: "uId must be a valid integer",
+		})
+		return
+	}
+
+	var user models.UserModel
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error:   "Invalid input",
+			Details: err.Error(),
+		})
+		return
+	}
+
+	// Ensure the uId in the payload matches the path parameter
+	user.UId = uId
+
+	err = uc.Service.UpdateUser(c.Request.Context(), &user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			c.JSON(http.StatusNotFound, ErrorResponse{
+				Error:   "User not found",
+				Details: "No user found with the given uId",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error:   "Internal Server Error",
+			Details: "Failed to update user",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

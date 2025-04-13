@@ -38,3 +38,7 @@ func (s *UserService) DeleteByUId(ctx context.Context, uId int) error {
 func (s *UserService) DeleteByUserId(ctx context.Context, userId string) error {
 	return s.repo.DeleteByUserId(ctx, userId)
 }
+
+func (s *UserService) UpdateUser(ctx context.Context, user *models.UserModel) error {
+	return s.repo.Update(ctx, user)
+}

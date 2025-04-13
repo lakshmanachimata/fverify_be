@@ -81,6 +81,20 @@ func main() {
 	// @Router /users [post]
 	router.POST("/users", userController.CreateUser)
 
+	// @Summary Update a user
+	// @Description Update an existing user's details
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param uId path int true "User uId"
+	// @Param user body models.UserModel true "Updated user data"
+	// @Success 200 {object} models.UserModel
+	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
+	// @Failure 404 {object} gin.H{"error": "User not found"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /users/uid/{uId} [put]
+	router.PUT("/users/uid/:uId", userController.UpdateUser)
+
 	// @Summary Get all users
 	// @Description Retrieve all users in the system
 	// @Tags Users

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"kowtha_be/internal/models"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -71,12 +72,6 @@ func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*m
 	return &user, err
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel) error {
-	user.UpdatedTime = time.Now()
-	_, err := r.collection.UpdateOne(ctx, bson.M{"userid": user.UserId}, bson.M{"$set": user})
-	return err
-}
-
 func (r *UserRepositoryImpl) DeleteByUId(ctx context.Context, uId int) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"uid": uId})
 	return err
@@ -102,4 +97,53 @@ func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserMod
 		users = append(users, &user)
 	}
 	return users, nil
+}
+
+func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel) error {
+	// Update the UpdatedTime field
+
+	var eUser models.UserModel
+	err := r.collection.FindOne(ctx, bson.M{"uid": user.UId}).Decode(&eUser)
+	if err != nil {
+		return err
+	}
+
+	// Generate a diff between the existing user and the incoming user
+	var updateComments []string
+	if eUser.UserId != user.UserId {
+		updateComments = append(updateComments, "user id  changed from '"+eUser.UserId+"' to '"+user.UserId+"'")
+	}
+	if eUser.Username != user.Username {
+		updateComments = append(updateComments, "user name changed from '"+eUser.Username+"' to '"+user.Username+"'")
+	}
+	if eUser.Password != user.Password {
+		updateComments = append(updateComments, "password updated")
+	}
+	if eUser.Role != user.Role {
+		updateComments = append(updateComments, "role changed from '"+string(eUser.Role)+"' to '"+string(user.Role)+"'")
+	}
+	if eUser.Status != user.Status {
+		updateComments = append(updateComments, "status changed from '"+string(eUser.Status)+"' to '"+string(user.Status)+"'")
+	}
+	if eUser.Remarks != user.Remarks {
+		updateComments = append(updateComments, "remarks changed from '"+eUser.Remarks+"' to '"+user.Remarks+"'")
+	}
+	if eUser.MobileNumber != user.MobileNumber {
+		updateComments = append(updateComments, "mobile number changed from '"+eUser.MobileNumber+"' to '"+user.MobileNumber+"'")
+	}
+
+	user.UpdatedTime = time.Now()
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     user.UpdatedTime,
+		UpdatedComments: strings.Join(updateComments, ", "),
+		UpdateBy:        "user",
+	})
+
+	// Perform the update operation
+	_, err = r.collection.UpdateOne(
+		ctx,
+		bson.M{"uid": user.UId}, // Filter by uId
+		bson.M{"$set": user},    // Update the user document
+	)
+	return err
 }
