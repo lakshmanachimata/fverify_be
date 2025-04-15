@@ -55,7 +55,7 @@ func main() {
 
 	// Initialize controllers
 	prospectController := controllers.NewProspectController(prospectService)
-	userController := controllers.NewUserController(userService)
+	userController := controllers.NewUserController(userService, orgService)
 	organisationController := controllers.NewOrganisationController(orgService)
 
 	// Set up Gin router
@@ -252,6 +252,19 @@ func main() {
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /admin/create [post]
 	router.POST("/users/owner/create", auth.APIKeyMiddleware(), userController.CreateOwner)
+
+	// @Summary Get user roles
+	// @Description Retrieve all user roles for a given organisation
+	// @Tags Users
+	// @Accept json
+	// @Produce json
+	// @Param orgId query string true "Organisation ID"
+	// @Success 200 {array} string
+	// @Failure 400 {object} gin.H{"error": "Invalid orgId"}
+	// @Failure 404 {object} gin.H{"error": "Organisation not found or inactive"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /users/roles [get]
+	router.GET("/users/roles", userController.GetUserRoles)
 
 	// Prospect APIs
 	// @Summary Create a new prospect
