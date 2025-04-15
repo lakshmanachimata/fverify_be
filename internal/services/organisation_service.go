@@ -28,3 +28,6 @@ func (s *OrganisationService) DeleteOrganisation(ctx context.Context, orgId stri
 func (s *OrganisationService) GetAllOrganisations(ctx context.Context) ([]*models.Organisation, error) {
 	return s.repo.GetAllOrganisations(ctx)
 }
+func (s *OrganisationService) IsOrgActive(ctx context.Context, orgId string) (bool, error) {
+	return s.repo.IsOrgActive(ctx, orgId)
+}

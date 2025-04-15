@@ -12,7 +12,8 @@ import (
 )
 
 type UserController struct {
-	Service *services.UserService
+	Service    *services.UserService
+	OrgService *services.OrganisationService // Add this field
 }
 
 type ErrorResponse struct {
@@ -44,8 +45,11 @@ type InvalidAPIKeyResponse struct {
 	Details string `json:"details" example:"API key is invalid"` // Additional details about the error
 }
 
-func NewUserController(service *services.UserService) *UserController {
-	return &UserController{Service: service}
+func NewUserController(userService *services.UserService, orgService *services.OrganisationService) *UserController {
+	return &UserController{
+		Service:    userService,
+		OrgService: orgService, // Initialize OrgService
+	}
 }
 
 // CreateUser godoc
@@ -425,4 +429,48 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, createdUser)
+}
+
+// GetUserRoles godoc
+// @Summary Get user roles
+// @Description Retrieve all user roles for a given organisation
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param orgId query string true "Organisation ID"
+// @Success 200 {array} string
+// @Failure 400 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Failure 404 {object} NotFoundResponse
+// @Failure 401 {object} InvalidAuthResponse
+// @Failure 500 {object} InternalErrorResponse
+// @Router /users/roles [get]
+func (uc *UserController) GetUserRoles(c *gin.Context) {
+	orgId := c.Query("orgId")
+	if orgId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgId is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), orgId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found or inactive"})
+		return
+	}
+
+	// Return the list of user roles
+	roles := []string{
+		string(models.Admin),
+		string(models.OperationsLead),
+		string(models.FieldLead),
+		string(models.FieldExecutive),
+		string(models.Owner),
+		string(models.OperationsExecutive),
+	}
+	c.JSON(http.StatusOK, roles)
 }
