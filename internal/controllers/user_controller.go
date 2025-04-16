@@ -72,9 +72,6 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	// Ensure uId is not set by the payload
-	user.UId = 0
-
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -202,7 +199,7 @@ func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param uId path int true "User uId"
+// @Param uId path string true "User uId"
 // @Param user body models.UserModel true "Updated user data"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -215,11 +212,6 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	authUser := claims.(*auth.AuthTokenClaims)
 
 	uIdParam := c.Param("uId")
-	uId, err := strconv.Atoi(uIdParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid uId"})
-		return
-	}
 
 	var user models.UserModel
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -228,7 +220,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	}
 
 	// Ensure the uId in the payload matches the path parameter
-	user.UId = uId
+	user.UId = uIdParam
 
 	// Restrict role changes for Operations Lead
 	if authUser.Role == string(models.OperationsLead) && user.Role != "" && string(user.Role) != authUser.Role {
@@ -236,7 +228,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	err = uc.Service.UpdateUser(c.Request.Context(), &user)
+	err := uc.Service.UpdateUser(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
@@ -283,7 +275,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	}
 
 	// Generate the token
-	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber, user.OrgUUID)
+	token, err := auth.GenerateAuthToken(user.UserId, user.Username, user.UId, string(user.Role), string(user.Status), user.MobileNumber, user.OrgUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -391,9 +383,6 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 	// Ensure the role is set to Admin
 	user.Role = models.Admin
 
-	// Ensure uId is not set by the payload
-	user.UId = 0
-
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create admin user"})
@@ -425,9 +414,6 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 
 	// Ensure the role is set to Admin
 	user.Role = models.Owner
-
-	// Ensure uId is not set by the payload
-	user.UId = 0
 
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {

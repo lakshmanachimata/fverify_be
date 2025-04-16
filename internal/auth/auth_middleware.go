@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fverify_be/internal/repositories"
 	"net/http"
 	"strings"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
+func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo repositories.UserRepositoryImpl, requiredRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract the token from the Authorization header
 		authHeader := c.GetHeader("Authorization")
@@ -28,11 +29,57 @@ func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
 			return
 		}
 
+		// Extract orgId from the request (assuming it's passed as a query parameter or path parameter)
+		orgId := c.Param("orgId")
+		if orgId == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "orgId is required"})
+			c.Abort()
+			return
+		}
+
+		// Step 1: Get org from orgId
+		org, err := orgRepo.GetOrganisationByID(c.Request.Context(), orgId)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found"})
+			c.Abort()
+			return
+		}
+
+		// Step 2: Check if orgUUID from token matches orgUUID fetched from org
+		if claims.OrgUUID != org.OrgUUID {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Organisation mismatch"})
+			c.Abort()
+			return
+		}
+
+		// Step 3: Check if org status and user status are active
+		if string(org.Status) != "Active" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied: Inactive organisation"})
+			c.Abort()
+			return
+		}
+
+		// Step 4: Get user from claims.UserId
+		user, err := userRepo.GetByUserID(c.Request.Context(), claims.UserId)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			c.Abort()
+			return
+		}
+
+		// Step 5: Check if user status is active
+		if string(user.Status) != "Active" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Inactive user"})
+			c.Abort()
+			return
+		}
+
 		// Check if the user's role is allowed
 		for _, role := range requiredRoles {
 			if claims.Role == role {
-				// Add user details to the context
+				// Add user and org details to the context
 				c.Set("user", claims)
+				c.Set("org", org)
 				c.Next()
 				return
 			}

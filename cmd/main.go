@@ -170,7 +170,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users [post]
-	router.POST("/users", auth.AuthMiddleware("Admin", "Owner"), userController.CreateUser)
+	router.POST("/users", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.CreateUser)
 
 	// @Summary Update a user
 	// @Description Update an existing user's details
@@ -185,7 +185,7 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/uid/{uId} [put]
-	router.PUT("/users/uid/:uId", auth.AuthMiddleware("Admin", "Owner", "Operations Lead"), userController.UpdateUser)
+	router.PUT("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead"), userController.UpdateUser)
 
 	// @Summary Get all users
 	// @Description Retrieve all users in the system
@@ -196,7 +196,7 @@ func main() {
 	// @Success 200 {array} models.UserModel
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users [get]
-	router.GET("/users", auth.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetAllUsers)
+	router.GET("/users", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetAllUsers)
 
 	// @Summary Get a user by ID
 	// @Description Retrieve a user by their unique ID
@@ -209,7 +209,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid user ID"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/{userId} [get]
-	router.GET("/users/:userId", auth.AuthMiddleware("Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetUserByUserID)
+	router.GET("/users/:userId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetUserByUserID)
 
 	// @Summary Delete a user by uId
 	// @Description Delete a user by their unique uId
@@ -220,7 +220,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/uid/{uId} [delete]
-	router.DELETE("/users/uid/:uId", auth.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUId)
+	router.DELETE("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUId)
 
 	// @Summary Delete a user by userId
 	// @Description Delete a user by their unique userId
@@ -231,7 +231,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/userid/{userId} [delete]
-	router.DELETE("/users/userid/:userId", auth.AuthMiddleware("Admin", "Owner"), userController.DeleteUserByUserId)
+	router.DELETE("/users/userid/:userId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUserId)
 
 	// @Summary Set a user's password
 	// @Description Set a new password for a user
@@ -247,7 +247,7 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/uid/{uId}/setpassword [put]
-	router.PUT("/users/uid/:uId/setpassword", auth.AuthMiddleware("Admin", "Owner", "Operations Lead"), userController.SetPassword)
+	router.PUT("/users/uid/:uId/setpassword", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead"), userController.SetPassword)
 
 	// @Summary Create a new admin user
 	// @Description Create a new admin user in the system (requires API key)

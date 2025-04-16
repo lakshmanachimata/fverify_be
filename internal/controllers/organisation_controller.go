@@ -7,7 +7,6 @@ import (
 	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type OrganisationController struct {
@@ -37,9 +36,6 @@ func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-
-	// Generate org_uuid internally
-	org.OrgUUID = uuid.New().String()
 
 	createdOrg, err := oc.Service.CreateOrganisation(c.Request.Context(), &org)
 	if err != nil {

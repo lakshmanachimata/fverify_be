@@ -2,41 +2,32 @@ package repositories
 
 import (
 	"context"
-	"fverify_be/internal/auth"
 	"fverify_be/internal/models"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepositoryImpl struct {
 	collection *mongo.Collection
 }
 
+// HashPassword hashes a plain-text password using bcrypt
+func HashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashedPassword), nil
+}
+
 func NewUserRepository(client *mongo.Client, dbName, collectionName string) *UserRepositoryImpl {
 	collection := client.Database(dbName).Collection(collectionName)
 	return &UserRepositoryImpl{collection: collection}
-}
-
-func (r *UserRepositoryImpl) getNextUserID(ctx context.Context) (int, error) {
-	counter := struct {
-		SequenceValue int `bson:"sequence_value"`
-	}{}
-
-	filter := bson.M{"_id": "user_uid"}                                 // Counter identifier for uId
-	update := bson.M{"$inc": bson.M{"sequence_value": 1}}               // Increment the counter
-	opts := options.FindOneAndUpdate().SetReturnDocument(options.After) // Return the updated document
-
-	// Increment the counter and retrieve the updated value
-	err := r.collection.Database().Collection("counters").FindOneAndUpdate(ctx, filter, update, opts).Decode(&counter)
-	if err != nil {
-		return 0, err
-	}
-
-	return counter.SequenceValue, nil
 }
 
 func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgUUID string) (*models.UserModel, error) {
@@ -50,7 +41,7 @@ func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, passwor
 
 func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId int, newPassword string) error {
 	// Hash the new password
-	hashedPassword, err := auth.HashPassword(newPassword)
+	hashedPassword, err := HashPassword(newPassword)
 	if err != nil {
 		return err
 	}
@@ -66,14 +57,10 @@ func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId int, newPasswo
 
 func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
 	// Generate the next unique ID (uId)
-	nextUId, err := r.getNextUserID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	user.UId = nextUId // Set the auto-incremented uId
+	user.UId = uuid.New().String()
 
 	// Hash the password
-	hashedPassword, err := auth.HashPassword(user.Password)
+	hashedPassword, err := HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}

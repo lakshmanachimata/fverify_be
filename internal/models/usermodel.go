@@ -59,7 +59,7 @@ type UpdateHistory struct {
 //		  "orgId": "123456"
 //		}
 type UserModel struct {
-	UId           int                `bson:"uid" json:"uid" example:"1"`                                              // Auto-incremented unique identifier
+	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
 	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
 	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
 	Password      string             `bson:"password" json:"password" example:"hashed_password"`                      // Hashed password
@@ -100,7 +100,7 @@ type LoginRequest struct {
 //	  "token": "<jwt_token>"
 //	}
 type LoginResponse struct {
-	UId          int    `json:"uid" example:"1"`                   // User's unique ID
+	UId          string `json:"uid" example:"1"`                   // User's unique ID
 	UserId       string `json:"userId" example:"12345"`            // User's unique identifier
 	Username     string `json:"username" example:"john_doe"`       // Username
 	Role         string `json:"role" example:"Admin"`              // Role of the user
