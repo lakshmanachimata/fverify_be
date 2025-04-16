@@ -1482,7 +1482,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:9000",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
-	Title:            "Kowtha API",
+	Title:            "FVerify API",
 	Description:      "This is the API documentation for the Kowtha backend.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

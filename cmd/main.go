@@ -19,7 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
-// @title Kowtha API
+// @title FVerify API
 // @version 1.0
 // @description This is the API documentation for the Kowtha backend.
 // @host localhost:9000
@@ -62,7 +62,7 @@ func main() {
 	router := gin.Default()
 
 	// Swagger setup
-	docs.SwaggerInfo.Title = "Kowtha API"
+	docs.SwaggerInfo.Title = "FVerify API"
 	docs.SwaggerInfo.Description = "This is the API documentation for the Kowtha backend."
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:9000"
