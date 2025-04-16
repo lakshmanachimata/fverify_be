@@ -116,16 +116,17 @@ definitions:
         type: string
     type: object
   models.Organisation:
+    description: Organisation model containing all organisation-related information.
     properties:
-      orgId:
+      org_id:
         description: Organisation ID
         example: "12345"
         type: string
-      orgName:
+      org_name:
         description: Organisation Name
         example: Acme Corp
         type: string
-      orgUUID:
+      org_uuid:
         description: Auto-generated UUID
         example: uuid-v4
         type: string
@@ -336,9 +337,14 @@ definitions:
         description: Mobile number of the user
         example: "9876543210"
         type: string
-      orgId:
+      org_status:
+        allOf:
+        - $ref: '#/definitions/models.OrganisationStatus'
         description: Organization ID
         example: "123456"
+      org_uuid:
+        description: UUID of the organization
+        example: 123e4567-e89b-12d3-a456-426614174000
         type: string
       password:
         description: Hashed password
@@ -504,10 +510,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controllers.NotFoundResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -516,41 +518,6 @@ paths:
       tags:
       - Organisations
   /organisations/{orgId}:
-    delete:
-      description: Delete an organisation by its ID
-      parameters:
-      - description: API key
-        in: header
-        name: X-API-Key
-        required: true
-        type: string
-      - description: Organisation ID
-        in: path
-        name: orgId
-        required: true
-        type: string
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/controllers.InvalidAPIKeyResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controllers.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.InternalErrorResponse'
-      summary: Delete an organisation
-      tags:
-      - Organisations
     put:
       consumes:
       - application/json

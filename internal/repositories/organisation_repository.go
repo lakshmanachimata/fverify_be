@@ -70,3 +70,11 @@ func (r *OrganisationRepository) IsOrgActive(ctx context.Context, orgId string) 
 	}
 	return true, nil
 }
+func (r *OrganisationRepository) GetOrganisationByID(ctx context.Context, orgId string) (*models.Organisation, error) {
+	var org models.Organisation
+	err := r.collection.FindOne(ctx, bson.M{"org_id": orgId}).Decode(&org)
+	if err != nil {
+		return nil, err
+	}
+	return &org, nil
+}

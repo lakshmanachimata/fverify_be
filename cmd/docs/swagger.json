@@ -163,12 +163,6 @@
                             "$ref": "#/definitions/controllers.InvalidAPIKeyResponse"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.NotFoundResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -222,58 +216,6 @@
                         "schema": {
                             "$ref": "#/definitions/models.Organisation"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InvalidAPIKeyResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InternalErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete an organisation by its ID",
-                "tags": [
-                    "Organisations"
-                ],
-                "summary": "Delete an organisation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "API key",
-                        "name": "X-API-Key",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "orgId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1146,19 +1088,20 @@
             }
         },
         "models.Organisation": {
+            "description": "Organisation model containing all organisation-related information.",
             "type": "object",
             "properties": {
-                "orgId": {
+                "org_id": {
                     "description": "Organisation ID",
                     "type": "string",
                     "example": "12345"
                 },
-                "orgName": {
+                "org_name": {
                     "description": "Organisation Name",
                     "type": "string",
                     "example": "Acme Corp"
                 },
-                "orgUUID": {
+                "org_uuid": {
                     "description": "Auto-generated UUID",
                     "type": "string",
                     "example": "uuid-v4"
@@ -1429,10 +1372,19 @@
                     "type": "string",
                     "example": "9876543210"
                 },
-                "orgId": {
+                "org_status": {
                     "description": "Organization ID",
-                    "type": "string",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.OrganisationStatus"
+                        }
+                    ],
                     "example": "123456"
+                },
+                "org_uuid": {
+                    "description": "UUID of the organization",
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
                 },
                 "password": {
                     "description": "Hashed password",

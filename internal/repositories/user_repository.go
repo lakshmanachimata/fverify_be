@@ -39,9 +39,9 @@ func (r *UserRepositoryImpl) getNextUserID(ctx context.Context) (int, error) {
 	return counter.SequenceValue, nil
 }
 
-func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgId string) (*models.UserModel, error) {
+func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgUUID string) (*models.UserModel, error) {
 	var user models.UserModel
-	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password, "orgid": orgId}).Decode(&user)
+	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password, "org_uuid": orgUUID}).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
@@ -183,6 +183,14 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel)
 		ctx,
 		bson.M{"uid": user.UId}, // Filter by uId
 		bson.M{"$set": user},    // Update the user document
+	)
+	return err
+}
+func (r *UserRepositoryImpl) UpdateUsersStatusByOrgUUID(ctx context.Context, orgUUID string, status models.UserStatus) error {
+	_, err := r.collection.UpdateMany(
+		ctx,
+		bson.M{"org_uuid": orgUUID},              // Filter by org_uuid
+		bson.M{"$set": bson.M{"status": status}}, // Update the status field
 	)
 	return err
 }

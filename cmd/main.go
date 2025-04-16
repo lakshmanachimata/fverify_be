@@ -51,7 +51,7 @@ func main() {
 	// Initialize services
 	prospectService := services.NewProspectService(prospectRepo)
 	userService := services.NewUserService(userRepo)
-	orgService := services.NewOrganisationService(orgRepo)
+	orgService := services.NewOrganisationService(orgRepo, userRepo)
 
 	// Initialize controllers
 	prospectController := controllers.NewProspectController(prospectService)
@@ -100,17 +100,17 @@ func main() {
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /organisations/{orgId} [put]
 	router.PUT("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.UpdateOrganisation)
-	// @Summary Delete an organisation
-	// @Description Delete an organisation by its ID
-	// @Tags Organisations
-	// @Param X-API-Key header string true "API key"
-	// @Param orgId path string true "Organisation ID"
-	// @Success 204 "No Content"
-	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
-	// @Failure 404 {object} gin.H{"error": "Organisation not found"}
-	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
-	// @Router /organisations/{orgId} [delete]
-	router.DELETE("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
+	// // @Summary Delete an organisation
+	// // @Description Delete an organisation by its ID
+	// // @Tags Organisations
+	// // @Param X-API-Key header string true "API key"
+	// // @Param orgId path string true "Organisation ID"
+	// // @Success 204 "No Content"
+	// // @Failure 401 {object} gin.H{"error": "Invalid API key"}
+	// // @Failure 404 {object} gin.H{"error": "Organisation not found"}
+	// // @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// // @Router /organisations/{orgId} [delete]
+	// router.DELETE("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
 
 	// @Summary Get all organisations
 	// @Description Retrieve all organisations in the system

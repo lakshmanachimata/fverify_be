@@ -254,6 +254,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 // @Param login body models.LoginRequest true "Login credentials"
 // @Success 200 {object} models.LoginResponse
 // @Failure 401 {object} InvalidAuthResponse
+// @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /users/login [post]
 func (uc *UserController) LoginUser(c *gin.Context) {
@@ -263,20 +264,26 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := auth.HashPassword(loginRequest.Password)
+	// Check if the organisation exists and is active
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid organisation"})
+		return
 	}
 
 	// Validate the user
-	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, hashedPassword, loginRequest.OrgId)
+	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password, loginRequest.OrgId)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	// Generate the token
-	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber, user.OrgId)
+	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber, user.OrgUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return

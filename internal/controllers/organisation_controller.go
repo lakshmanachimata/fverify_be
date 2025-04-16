@@ -7,6 +7,7 @@ import (
 	"kowtha_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type OrganisationController struct {
@@ -28,7 +29,6 @@ func NewOrganisationController(service *services.OrganisationService) *Organisat
 // @Success 201 {object} models.Organisation
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAPIKeyResponse
-// @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /organisations [post]
 func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
@@ -37,6 +37,9 @@ func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
+
+	// Generate org_uuid internally
+	org.OrgUUID = uuid.New().String()
 
 	createdOrg, err := oc.Service.CreateOrganisation(c.Request.Context(), &org)
 	if err != nil {
@@ -63,7 +66,7 @@ func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
 // @Failure 500 {object} InternalErrorResponse
 // @Router /organisations/{orgId} [put]
 func (oc *OrganisationController) UpdateOrganisation(c *gin.Context) {
-	orgId := c.Param("orgId")
+	orgId := c.Param("org_id")
 
 	var org models.Organisation
 	if err := c.ShouldBindJSON(&org); err != nil {
@@ -71,38 +74,64 @@ func (oc *OrganisationController) UpdateOrganisation(c *gin.Context) {
 		return
 	}
 
-	err := oc.Service.UpdateOrganisation(c.Request.Context(), orgId, &org)
+	// Fetch the existing organisation to validate org_uuid
+	existingOrg, err := oc.Service.GetOrganisationByID(c.Request.Context(), orgId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found"})
+		return
+	}
+
+	// Check if org_uuid is being changed
+	if org.OrgUUID != "" && org.OrgUUID != existingOrg.OrgUUID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "org_uuid cannot be changed"})
+		return
+	}
+
+	// Ensure org_uuid remains unchanged
+	org.OrgUUID = existingOrg.OrgUUID
+
+	// Update the organisation
+	err = oc.Service.UpdateOrganisation(c.Request.Context(), orgId, &org)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update organisation"})
 		return
 	}
 
+	// If the organisation status is updated to Inactive, update all users' status to Inactive
+	if org.Status == models.OrgInActive {
+		err = oc.Service.UpdateUsersStatusByOrgUUID(c.Request.Context(), org.OrgUUID, models.InActive)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update users' status"})
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, org)
 }
 
-// DeleteOrganisation godoc
-// @Summary Delete an organisation
-// @Description Delete an organisation by its ID
-// @Tags Organisations
-// @Param X-API-Key header string true "API key"
-// @Param orgId path string true "Organisation ID"
-// @Success 204 "No Content"
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} InvalidAPIKeyResponse
-// @Failure 404 {object} NotFoundResponse
-// @Failure 500 {object} InternalErrorResponse
-// @Router /organisations/{orgId} [delete]
-func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
-	orgId := c.Param("orgId")
+// // DeleteOrganisation godoc
+// // @Summary Delete an organisation
+// // @Description Delete an organisation by its ID
+// // @Tags Organisations
+// // @Param X-API-Key header string true "API key"
+// // @Param orgId path string true "Organisation ID"
+// // @Success 204 "No Content"
+// // @Failure 400 {object} ErrorResponse
+// // @Failure 401 {object} InvalidAPIKeyResponse
+// // @Failure 404 {object} NotFoundResponse
+// // @Failure 500 {object} InternalErrorResponse
+// // @Router /organisations/{orgId} [delete]
+// func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
+// 	orgId := c.Param("org_id")
 
-	err := oc.Service.DeleteOrganisation(c.Request.Context(), orgId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete organisation"})
-		return
-	}
+// 	err := oc.Service.DeleteOrganisation(c.Request.Context(), orgId)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete organisation"})
+// 		return
+// 	}
 
-	c.Status(http.StatusNoContent)
-}
+// 	c.Status(http.StatusNoContent)
+// }
 
 // GetAllOrganisations godoc
 // @Summary Get all organisations
