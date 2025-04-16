@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 
-	"kowtha_be/internal/auth"
-	"kowtha_be/internal/controllers"
-	"kowtha_be/internal/repositories"
-	"kowtha_be/internal/services"
+	"fverify_be/internal/auth"
+	"fverify_be/internal/controllers"
+	"fverify_be/internal/repositories"
+	"fverify_be/internal/services"
 
-	"kowtha_be/cmd/docs"
+	"fverify_be/cmd/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -21,14 +21,14 @@ import (
 
 // @title FVerify API
 // @version 1.0
-// @description This is the API documentation for the Kowtha backend.
+// @description This is the API documentation for the Fverify backend.
 // @host localhost:9000
 // @BasePath /
 // @schemes http
 func main() {
 	// Set up MongoDB connection
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI("mongodb+srv://kowtha:nearhop%40123@applicants.cq0no3x.mongodb.net/?appName=Applicants").SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI("mongodb+srv://fverify:nearhop%40123@applicants.cq0no3x.mongodb.net/?appName=Applicants").SetServerAPIOptions(serverAPI)
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(opts)
 	if err != nil {
@@ -44,9 +44,9 @@ func main() {
 		panic(err)
 	}
 	// Initialize repositories
-	prospectRepo := repositories.NewProspectRepository(client, "kowtha_db", "prospects")
-	userRepo := repositories.NewUserRepository(client, "kowtha_db", "users")
-	orgRepo := repositories.NewOrganisationRepository(client, "kowtha_db", "orgs")
+	prospectRepo := repositories.NewProspectRepository(client, "fverify_db", "prospects")
+	userRepo := repositories.NewUserRepository(client, "fverify_db", "users")
+	orgRepo := repositories.NewOrganisationRepository(client, "fverify_db", "orgs")
 
 	// Initialize services
 	prospectService := services.NewProspectService(prospectRepo)
@@ -63,7 +63,7 @@ func main() {
 
 	// Swagger setup
 	docs.SwaggerInfo.Title = "FVerify API"
-	docs.SwaggerInfo.Description = "This is the API documentation for the Kowtha backend."
+	docs.SwaggerInfo.Description = "This is the API documentation for the Fverify backend."
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:9000"
 	docs.SwaggerInfo.BasePath = "/"

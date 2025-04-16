@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"kowtha_be/internal/auth"
-	"kowtha_be/internal/models"
-	"kowtha_be/internal/services"
+	"fverify_be/internal/auth"
+	"fverify_be/internal/models"
+	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
 )

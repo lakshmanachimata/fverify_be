@@ -1483,7 +1483,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "FVerify API",
-	Description:      "This is the API documentation for the Kowtha backend.",
+	Description:      "This is the API documentation for the Fverify backend.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

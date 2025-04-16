@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"kowtha_be/internal/models"
+	"fverify_be/internal/models"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"

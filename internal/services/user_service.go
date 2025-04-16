@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"kowtha_be/internal/models"
+	"fverify_be/internal/models"
 
-	"kowtha_be/internal/repositories"
+	"fverify_be/internal/repositories"
 )
 
 type UserService struct {

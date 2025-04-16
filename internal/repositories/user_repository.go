@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"context"
-	"kowtha_be/internal/auth"
-	"kowtha_be/internal/models"
+	"fverify_be/internal/auth"
+	"fverify_be/internal/models"
 	"strings"
 	"time"
 

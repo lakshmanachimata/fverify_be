@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"kowtha_be/internal/models"
-	"kowtha_be/internal/services"
+	"fverify_be/internal/models"
+	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
