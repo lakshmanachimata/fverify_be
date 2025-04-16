@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 
 	"fverify_be/internal/auth"
 	"fverify_be/internal/controllers"
@@ -41,9 +42,12 @@ func main() {
 	username := viper.GetString("mongodb.username")
 	password := viper.GetString("mongodb.password")
 	uri := viper.GetString("mongodb.uri")
+	// URL-encode the username and password
+	encodedUsername := url.QueryEscape(username)
+	encodedPassword := url.QueryEscape(password)
 
 	// Construct MongoDB URI
-	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s", username, password, uri)
+	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s", encodedUsername, encodedPassword, uri)
 
 	// Set up MongoDB connection
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
