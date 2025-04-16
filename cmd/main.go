@@ -165,7 +165,7 @@ func main() {
 	// @Param Authorization header string true "Bearer token"
 	// @Accept json
 	// @Produce json
-	// @Param user body models.UserModel true "User data"
+	// @Param user body models.UserReqModel true "User data"
 	// @Success 201 {object} models.UserModel
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
@@ -180,7 +180,7 @@ func main() {
 	// @Produce json
 	// @Param uId path int true "User uId"
 	// @Param user body models.UserModel true "Updated user data"
-	// @Success 200 {object} models.UserModel
+	// @Success 200 {object} models.UserReqModel
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
@@ -255,7 +255,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param X-API-Key header string true "API key"
-	// @Param user body models.UserModel true "Admin user data"
+	// @Param user body models.UserReqModel true "Admin user data"
 	// @Success 201 {object} models.UserModel
 	// @Failure 400 {object} gin.H{"error": "Invalid input"}
 	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
@@ -269,7 +269,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param X-API-Key header string true "API key"
-	// @Param user body models.UserModel true "Admin user data"
+	// @Param user body models.UserReqModel true "Admin user data"
 	// @Success 201 {object} models.UserModel
 	// @Failure 400 {object} gin.H{"error": "Invalid input"}
 	// @Failure 401 {object} gin.H{"error": "Invalid API key"}

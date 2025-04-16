@@ -482,7 +482,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserModel'
+          $ref: '#/definitions/models.UserReqModel'
       produces:
       - application/json
       responses:
@@ -636,7 +636,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserModel'
+          $ref: '#/definitions/models.UserReqModel'
       produces:
       - application/json
       responses:
