@@ -543,6 +543,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/controllers.InvalidAuthResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
