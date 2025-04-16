@@ -229,13 +229,25 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 
 	uIdParam := c.Param("uId")
 
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// Ensure the uId in the payload matches the path parameter
+	var user models.UserModel
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Password = reqUser.Password
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.CreatedTime = reqUser.CreatedTime
+	user.UpdatedTime = reqUser.UpdatedTime
+	user.UpdateHistory = reqUser.UpdateHistory
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgStatus = reqUser.OrgStatus
+	user.OrgUUID = reqUser.OrgUUID
 	user.UId = uIdParam
 
 	// Restrict role changes for Operations Lead
