@@ -386,6 +386,61 @@ definitions:
         example: john_doe
         type: string
     type: object
+  models.UserReqModel:
+    properties:
+      created_time:
+        description: Time when the user was created
+        example: "2023-04-12T15:04:05Z"
+        type: string
+      mobile_number:
+        description: Mobile number of the user
+        example: "9876543210"
+        type: string
+      org_status:
+        allOf:
+        - $ref: '#/definitions/models.OrganisationStatus'
+        description: Organization ID
+        example: "123456"
+      org_uuid:
+        description: UUID of the organization
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      password:
+        description: Hashed password
+        example: hashed_password
+        type: string
+      remarks:
+        description: Additional remarks about the user
+        example: User is active and verified
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/models.Role'
+        description: Role of the user
+        example: Admin
+      status:
+        allOf:
+        - $ref: '#/definitions/models.UserStatus'
+        description: Status of the user
+        example: Active
+      update_history:
+        description: History of updates
+        items:
+          $ref: '#/definitions/models.UpdateHistory'
+        type: array
+      updated_time:
+        description: Time when the user was last updated
+        example: "2023-04-12T15:04:05Z"
+        type: string
+      userid:
+        description: Unique identifier for the user
+        example: "112345"
+        type: string
+      username:
+        description: Username of the user
+        example: john_doe
+        type: string
+    type: object
   models.UserStatus:
     enum:
     - Created
@@ -713,7 +768,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserModel'
+          $ref: '#/definitions/models.UserReqModel'
       produces:
       - application/json
       responses:

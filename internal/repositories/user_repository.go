@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"golang.org/x/crypto/bcrypt"
@@ -57,8 +56,6 @@ func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId int, newPasswo
 
 func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
 	// Generate the next unique ID (uId)
-	user.UId = uuid.New().String()
-
 	// Hash the password
 	hashedPassword, err := HashPassword(user.Password)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type UserController struct {
@@ -59,18 +60,33 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param user body models.UserModel true "User data"
+// @Param user body models.UserReqModel true "User data"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	var user models.UserModel
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Password = reqUser.Password
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.CreatedTime = reqUser.CreatedTime
+	user.UpdatedTime = reqUser.UpdatedTime
+	user.UpdateHistory = reqUser.UpdateHistory
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgStatus = reqUser.OrgStatus
+	user.OrgUUID = reqUser.OrgUUID
+
+	user.UId = uuid.New().String()
 
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {

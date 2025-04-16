@@ -74,6 +74,21 @@ type UserModel struct {
 	OrgUUID       string             `bson:"org_uuid" json:"org_uuid" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
 }
 
+type UserReqModel struct {
+	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
+	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
+	Password      string             `bson:"password" json:"password" example:"hashed_password"`                      // Hashed password
+	Role          Role               `bson:"role" json:"role" example:"Admin"`                                        // Role of the user
+	Status        UserStatus         `bson:"status" json:"status" example:"Active"`                                   // Status of the user
+	CreatedTime   time.Time          `bson:"created_time" json:"created_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was created
+	UpdatedTime   time.Time          `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was last updated
+	UpdateHistory []UpdateHistory    `bson:"update_history" json:"update_history"`                                    // History of updates
+	Remarks       string             `bson:"remarks" json:"remarks" example:"User is active and verified"`            // Additional remarks about the user
+	MobileNumber  string             `bson:"mobile_number" json:"mobile_number" example:"9876543210"`                 // Mobile number of the user
+	OrgStatus     OrganisationStatus `bson:"org_status" json:"org_status" example:"123456"`                           // Organization ID
+	OrgUUID       string             `bson:"org_uuid" json:"org_uuid" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
+}
+
 // LoginRequest represents the request payload for the login API.
 // @Description Login request payload containing username and password.
 //

@@ -471,7 +471,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserReqModel"
                         }
                     }
                 ],
@@ -1424,6 +1424,85 @@
                     "description": "Auto-incremented unique identifier",
                     "type": "string",
                     "example": "123e4567-e89b-12d3-a456-426614174111"
+                },
+                "update_history": {
+                    "description": "History of updates",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UpdateHistory"
+                    }
+                },
+                "updated_time": {
+                    "description": "Time when the user was last updated",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
+                },
+                "userid": {
+                    "description": "Unique identifier for the user",
+                    "type": "string",
+                    "example": "112345"
+                },
+                "username": {
+                    "description": "Username of the user",
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        },
+        "models.UserReqModel": {
+            "type": "object",
+            "properties": {
+                "created_time": {
+                    "description": "Time when the user was created",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
+                },
+                "mobile_number": {
+                    "description": "Mobile number of the user",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "org_status": {
+                    "description": "Organization ID",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.OrganisationStatus"
+                        }
+                    ],
+                    "example": "123456"
+                },
+                "org_uuid": {
+                    "description": "UUID of the organization",
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "password": {
+                    "description": "Hashed password",
+                    "type": "string",
+                    "example": "hashed_password"
+                },
+                "remarks": {
+                    "description": "Additional remarks about the user",
+                    "type": "string",
+                    "example": "User is active and verified"
+                },
+                "role": {
+                    "description": "Role of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Role"
+                        }
+                    ],
+                    "example": "Admin"
+                },
+                "status": {
+                    "description": "Status of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UserStatus"
+                        }
+                    ],
+                    "example": "Active"
                 },
                 "update_history": {
                     "description": "History of updates",
