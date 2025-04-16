@@ -692,84 +692,6 @@
                 }
             }
         },
-        "/users/uid/{uId}/setpassword": {
-            "put": {
-                "description": "Set a new password for a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Set a user's password",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "User uId",
-                        "name": "uId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "New password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.SetPasswordRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InternalErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/users/{userId}": {
             "get": {
                 "description": "Retrieve a user by their unique ID",
@@ -907,16 +829,6 @@
                     "description": "Error message",
                     "type": "string",
                     "example": "No data"
-                }
-            }
-        },
-        "controllers.SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "description": "Success message",
-                    "type": "string",
-                    "example": "User created successfully"
                 }
             }
         },
@@ -1224,19 +1136,6 @@
                 "OperationsExecutive"
             ]
         },
-        "models.SetPasswordRequest": {
-            "type": "object",
-            "required": [
-                "password"
-            ],
-            "properties": {
-                "password": {
-                    "description": "New password",
-                    "type": "string",
-                    "example": "new_password"
-                }
-            }
-        },
         "models.UpdateHistory": {
             "description": "History of updates made to a user.",
             "type": "object",
@@ -1289,7 +1188,7 @@
                 "password": {
                     "description": "Hashed password",
                     "type": "string",
-                    "example": "hashed_password"
+                    "example": "plane_password"
                 },
                 "remarks": {
                     "description": "Additional remarks about the user",
@@ -1373,7 +1272,7 @@
                 "password": {
                     "description": "Hashed password",
                     "type": "string",
-                    "example": "hashed_password"
+                    "example": "plane_password"
                 },
                 "remarks": {
                     "description": "Additional remarks about the user",

@@ -24,6 +24,11 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
+// CheckPassword compares a hashed password with a plain-text password
+func CheckPassword(hashedPassword, plainPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+}
+
 func NewUserRepository(client *mongo.Client, dbName, collectionName string) *UserRepositoryImpl {
 	collection := client.Database(dbName).Collection(collectionName)
 	return &UserRepositoryImpl{collection: collection}
@@ -31,14 +36,19 @@ func NewUserRepository(client *mongo.Client, dbName, collectionName string) *Use
 
 func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgUUID string) (*models.UserModel, error) {
 	var user models.UserModel
-	err := r.collection.FindOne(ctx, bson.M{"username": username, "password": password, "org_uuid": orgUUID}).Decode(&user)
+	err := r.collection.FindOne(ctx, bson.M{"username": username, "org_uuid": orgUUID}).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
+	// Compare the hashed password with the provided password
+	if err := CheckPassword(user.Password, password); err != nil {
+		return nil, err // Password does not match
+	}
+
 	return &user, nil
 }
 
-func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId int, newPassword string) error {
+func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId string, newPassword string) error {
 	// Hash the new password
 	hashedPassword, err := HashPassword(newPassword)
 	if err != nil {
@@ -89,13 +99,13 @@ func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*m
 	return &user, err
 }
 
-func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid int) (*models.UserModel, error) {
+func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid string) (*models.UserModel, error) {
 	var user models.UserModel
 	err := r.collection.FindOne(ctx, bson.M{"uid": uid}).Decode(&user)
 	return &user, err
 }
 
-func (r *UserRepositoryImpl) DeleteByUId(ctx context.Context, uId int) error {
+func (r *UserRepositoryImpl) DeleteByUId(ctx context.Context, uId string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"uid": uId})
 	return err
 }

@@ -43,7 +43,7 @@ type UpdateHistory struct {
 //		@Example {
 //		  "userid": "12345",
 //		  "username": "john_doe",
-//		  "password": "hashed_password",
+//		  "password": "plane_password",
 //		  "role": "Admin",
 //		  "status": "Active",
 //		  "created_time": "2023-04-12T15:04:05Z",
@@ -62,7 +62,7 @@ type UserModel struct {
 	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
 	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
 	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
-	Password      string             `bson:"password" json:"password" example:"hashed_password"`                      // Hashed password
+	Password      string             `bson:"password" json:"password" example:"plane_password"`                       // Hashed password
 	Role          Role               `bson:"role" json:"role" example:"Admin"`                                        // Role of the user
 	Status        UserStatus         `bson:"status" json:"status" example:"Active"`                                   // Status of the user
 	CreatedTime   time.Time          `bson:"created_time" json:"created_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was created
@@ -77,7 +77,7 @@ type UserModel struct {
 type UserReqModel struct {
 	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
 	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
-	Password      string             `bson:"password" json:"password" example:"hashed_password"`                      // Hashed password
+	Password      string             `bson:"password" json:"password" example:"plane_password"`                       // Hashed password
 	Role          Role               `bson:"role" json:"role" example:"Admin"`                                        // Role of the user
 	Status        UserStatus         `bson:"status" json:"status" example:"Active"`                                   // Status of the user
 	CreatedTime   time.Time          `bson:"created_time" json:"created_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was created

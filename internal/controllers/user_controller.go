@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"fverify_be/internal/auth"
 	"fverify_be/internal/models"
@@ -67,9 +66,44 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Failure 500 {object} InternalErrorResponse
 // @Router /users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
+	claims, _ := c.Get("user")
+	authUser := claims.(*auth.AuthTokenClaims)
 	var reqUser models.UserReqModel
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Role-based access control
+	switch authUser.Role {
+	case string(models.Owner):
+		// Owner can update all roles, no restrictions
+	case string(models.Admin):
+		if reqUser.Role != models.Admin &&
+			reqUser.Role != models.OperationsLead &&
+			reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins can not create owner"})
+			return
+		}
+	case string(models.OperationsLead):
+		if reqUser.Role != models.OperationsLead &&
+			reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can not create owner / admin"})
+			return
+		}
+	case string(models.OperationsExecutive):
+		if reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Executives can not create owner / admin / operations lead"})
+			return
+		}
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 		return
 	}
 	var user models.UserModel
@@ -160,16 +194,8 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Router /users/uid/{uId} [delete]
 // func (uc *UserController) DeleteUserByUId(c *gin.Context) {
 // 	uIdParam := c.Param("uId")
-// 	uId, err := strconv.Atoi(uIdParam)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, ErrorResponse{
-// 			Error:   "Invalid uId",
-// 			Details: "uId must be a valid integer",
-// 		})
-// 		return
-// 	}
 
-// 	err = uc.Service.DeleteByUId(c.Request.Context(), uId)
+// 	err = uc.Service.DeleteByUId(c.Request.Context(), uIdParam)
 // 	if err != nil {
 // 		c.JSON(http.StatusNotFound, ErrorResponse{
 // 			Error:   "User not found",
@@ -235,7 +261,49 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	// Fetch the target user to validate roles
+	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Role-based access control
+	switch authUser.Role {
+	case string(models.Owner):
+		// Owner can update all roles, no restrictions
+	case string(models.Admin):
+		if targetUser.Role != models.Admin &&
+			targetUser.Role != models.OperationsLead &&
+			targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins can only update specific roles"})
+			return
+		}
+	case string(models.OperationsLead):
+		if targetUser.Role != models.OperationsLead &&
+			targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only update specific roles"})
+			return
+		}
+	case string(models.OperationsExecutive):
+		if targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Executives can only update specific roles"})
+			return
+		}
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
+	// Update user data
 	var user models.UserModel
+	user.UId = uIdParam
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
 	user.Password = reqUser.Password
@@ -248,15 +316,8 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = reqUser.OrgUUID
-	user.UId = uIdParam
 
-	// Restrict role changes for Operations Lead
-	if authUser.Role == string(models.OperationsLead) && user.Role != "" && string(user.Role) != authUser.Role {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Operations Lead cannot change roles"})
-		return
-	}
-
-	err := uc.Service.UpdateUser(c.Request.Context(), &user)
+	err = uc.Service.UpdateUser(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
@@ -337,56 +398,51 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /users/uid/{uId}/setpassword [put]
-func (uc *UserController) SetPassword(c *gin.Context) {
-	claims, _ := c.Get("user")
-	authUser := claims.(*auth.AuthTokenClaims)
+// func (uc *UserController) SetPassword(c *gin.Context) {
+// 	claims, _ := c.Get("user")
+// 	authUser := claims.(*auth.AuthTokenClaims)
 
-	uIdParam := c.Param("uId")
-	uId, err := strconv.Atoi(uIdParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid uId"})
-		return
-	}
+// 	uIdParam := c.Param("uId")
 
-	var request models.SetPasswordRequest
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
+// 	var request models.SetPasswordRequest
+// 	if err := c.ShouldBindJSON(&request); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+// 		return
+// 	}
 
-	// Fetch the target user to validate roles
-	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uId)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+// 	// Fetch the target user to validate roles
+// 	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
+// 	if err != nil {
+// 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+// 		return
+// 	}
 
-	// Role-based access control
-	if authUser.Role == string(models.Admin) || authUser.Role == string(models.Owner) {
-		if targetUser.Role != models.Admin && targetUser.Role != models.OperationsLead {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Admins and Owners can only set passwords for Admins and Operations Leads"})
-			return
-		}
-	} else if authUser.Role == string(models.OperationsLead) {
-		if targetUser.Role != models.OperationsLead && targetUser.Role != models.FieldLead &&
-			targetUser.Role != models.FieldExecutive && targetUser.Role != models.OperationsExecutive {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only set passwords for specific roles"})
-			return
-		}
-	} else {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
-		return
-	}
+// 	// Role-based access control
+// 	if authUser.Role == string(models.Admin) || authUser.Role == string(models.Owner) {
+// 		if targetUser.Role != models.Admin && targetUser.Role != models.OperationsLead {
+// 			c.JSON(http.StatusForbidden, gin.H{"error": "Admins and Owners can only set passwords for Admins and Operations Leads"})
+// 			return
+// 		}
+// 	} else if authUser.Role == string(models.OperationsLead) {
+// 		if targetUser.Role != models.OperationsLead && targetUser.Role != models.FieldLead &&
+// 			targetUser.Role != models.FieldExecutive && targetUser.Role != models.OperationsExecutive {
+// 			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only set passwords for specific roles"})
+// 			return
+// 		}
+// 	} else {
+// 		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+// 		return
+// 	}
 
-	// Update the password
-	err = uc.Service.SetPassword(c.Request.Context(), uId, request.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
-		return
-	}
+// 	// Update the password
+// 	err = uc.Service.SetPassword(c.Request.Context(), uId, request.Password)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
-}
+// 	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+// }
 
 // CreateAdminUser godoc
 // @Summary Create a new admin user

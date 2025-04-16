@@ -185,7 +185,7 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/uid/{uId} [put]
-	router.PUT("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead"), userController.UpdateUser)
+	router.PUT("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.UpdateUser)
 
 	// @Summary Get all users
 	// @Description Retrieve all users in the system
@@ -247,7 +247,7 @@ func main() {
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/uid/{uId}/setpassword [put]
-	router.PUT("/users/uid/:uId/setpassword", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead"), userController.SetPassword)
+	// router.PUT("/users/uid/:uId/setpassword", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.SetPassword)
 
 	// @Summary Create a new admin user
 	// @Description Create a new admin user in the system (requires API key)
