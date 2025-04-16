@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"fverify_be/internal/auth"
@@ -12,6 +13,7 @@ import (
 	"fverify_be/cmd/docs"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -26,9 +28,27 @@ import (
 // @BasePath /
 // @schemes http
 func main() {
+	// Load configuration
+	viper.SetConfigName("config_db") // Name of the config file (without extension)
+	viper.SetConfigType("json")      // Config file type
+	viper.AddConfigPath(".")         // Path to look for the config file in the current directory
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file: %v", err)
+	}
+
+	// Get MongoDB credentials from config
+	username := viper.GetString("mongodb.username")
+	password := viper.GetString("mongodb.password")
+	uri := viper.GetString("mongodb.uri")
+
+	// Construct MongoDB URI
+	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s", username, password, uri)
+
 	// Set up MongoDB connection
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI("mongodb+srv://fverify:nearhop%40123@applicants.cq0no3x.mongodb.net/?appName=Applicants").SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI(mongoURI).SetServerAPIOptions(serverAPI)
+
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(opts)
 	if err != nil {
