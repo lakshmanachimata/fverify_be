@@ -43,8 +43,8 @@ func (s *UserService) DeleteByUserId(ctx context.Context, userId string) error {
 	return s.repo.DeleteByUserId(ctx, userId)
 }
 
-func (s *UserService) UpdateUser(ctx context.Context, user *models.UserModel) error {
-	return s.repo.Update(ctx, user)
+func (s *UserService) UpdateUser(ctx context.Context, user *models.UserModel, authUserName string) error {
+	return s.repo.Update(ctx, user, authUserName)
 }
 func (s *UserService) LoginUser(ctx context.Context, username, password string, orgId string) (*models.UserModel, error) {
 	return s.repo.ValidateUser(ctx, username, password, orgId)

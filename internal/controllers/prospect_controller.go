@@ -2,11 +2,14 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
+	"time"
 
 	"fverify_be/internal/models"
 	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ProspectController struct {
@@ -23,18 +26,60 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Tags Prospects
 // @Accept json
 // @Produce json
-// @Param prospect body models.ProspectModel true "Prospect data"
+// @Param prospect body models.ProspecReqtModel true "Prospect data"
 // @Success 201 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
-	var prospect models.ProspectModel
-	if err := c.ShouldBindJSON(&prospect); err != nil {
+	claims, _ := c.Get("user")
+	authUser := claims.(models.UserModel)
+	var reqProspect models.ProspecReqtModel
+	if err := c.ShouldBindJSON(&reqProspect); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	// Map all fields from ProspecReqtModel to ProspectModel
+	var prospect models.ProspectModel = models.ProspectModel{
+		ProspectId:            reqProspect.ProspectId,
+		ApplicantName:         reqProspect.ApplicantName,
+		MobileNumber:          reqProspect.MobileNumber,
+		Gender:                reqProspect.Gender,
+		Age:                   reqProspect.Age,
+		ResidentialAddress:    reqProspect.ResidentialAddress,
+		YearsOfStay:           reqProspect.YearsOfStay,
+		NumberOfFamilyMembers: reqProspect.NumberOfFamilyMembers,
+		ReferenceName:         reqProspect.ReferenceName,
+		ReferenceRelation:     reqProspect.ReferenceRelation,
+		ReferenceMobile:       reqProspect.ReferenceMobile,
+		EmploymentType:        reqProspect.EmploymentType,
+		OfficeAddress:         reqProspect.OfficeAddress,
+		YearsInCurrentOffice:  reqProspect.YearsInCurrentOffice,
+		Role:                  reqProspect.Role,
+		EmpId:                 reqProspect.EmpId,
+		Status:                reqProspect.Status,
+		PreviousExperience:    reqProspect.PreviousExperience,
+		GrossSalary:           reqProspect.GrossSalary,
+		NetSalary:             reqProspect.NetSalary,
+		ColleagueName:         reqProspect.ColleagueName,
+		ColleagueDesignation:  reqProspect.ColleagueDesignation,
+		ColleagueMobile:       reqProspect.ColleagueMobile,
+		UploadedImages:        reqProspect.UploadedImages,
+		Remarks:               reqProspect.Remarks,
+	}
+	// Assign unique ID and timestamps
+	prospect.UId = uuid.New().String()
+	prospect.CreatedBy = authUser.Username
+	prospect.CreatedTime = time.Now().UTC().Format(time.RFC3339) // Get current UTC time as string
+	prospect.UpdatedBy = authUser.Username
+	prospect.UpdatedTime = time.Now().UTC().Format(time.RFC3339) // Get current UTC time as string
+	prospect.UpdateHistory = append(prospect.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"Prospect created"}, ", "),
+		UpdateBy:        authUser.Username,
+	})
+	// Call the service to create the prospect
 	if err := pc.Service.CreateProspect(c.Request.Context(), &prospect); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create prospect"})
 		return

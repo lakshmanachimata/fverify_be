@@ -132,9 +132,8 @@ func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserMod
 	return users, nil
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel) error {
+func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel, authUserName string) error {
 	// Update the UpdatedTime field
-
 	var eUser models.UserModel
 	err := r.collection.FindOne(ctx, bson.M{"uid": user.UId}).Decode(&eUser)
 	if err != nil {
@@ -167,9 +166,9 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel)
 
 	user.UpdatedTime = time.Now()
 	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
-		UpdatedTime:     user.UpdatedTime,
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
 		UpdatedComments: strings.Join(updateComments, ", "),
-		UpdateBy:        "user",
+		UpdateBy:        authUserName,
 	})
 
 	// Perform the update operation

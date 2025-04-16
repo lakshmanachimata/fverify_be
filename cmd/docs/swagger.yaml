@@ -55,6 +55,14 @@ definitions:
         example: No data
         type: string
     type: object
+  models.EmploymentType:
+    enum:
+    - Employee
+    - Business
+    type: string
+    x-enum-varnames:
+    - Employee
+    - Business
   models.LoginRequest:
     description: Login request payload containing username and password.
     properties:
@@ -139,7 +147,7 @@ definitions:
     - OrgCreated
     - OrgActive
     - OrgInActive
-  models.ProspectModel:
+  models.ProspecReqtModel:
     description: Prospect model containing all prospect-related information.
     properties:
       age:
@@ -167,9 +175,10 @@ definitions:
         example: EMP123
         type: string
       employment_type:
+        allOf:
+        - $ref: '#/definitions/models.EmploymentType'
         description: Employment type ("Employee" or "Business")
         example: Employee
-        type: string
       gender:
         description: Gender of the applicant
         example: Male
@@ -178,10 +187,6 @@ definitions:
         description: Gross salary
         example: 50000
         type: number
-      id:
-        description: Incremental ID
-        example: 1
-        type: integer
       mobile_number:
         description: Mobile number of the applicant
         example: "9876543210"
@@ -235,6 +240,141 @@ definitions:
         - $ref: '#/definitions/models.ProspectStatus'
         description: Current status of the prospect
         example: Pending
+      uploaded_images:
+        description: Uploaded images
+        example:
+        - '["image1.jpg"'
+        - ' "image2.jpg"]'
+        items:
+          type: string
+        type: array
+      years_in_current_office:
+        description: Years in the current office
+        example: 3
+        type: integer
+      years_of_stay:
+        description: Years of stay at the current address
+        example: 5
+        type: integer
+    type: object
+  models.ProspectModel:
+    description: Prospect model containing all prospect-related information.
+    properties:
+      age:
+        description: Age of the applicant
+        example: 30
+        type: integer
+      applicant_name:
+        description: Name of the applicant
+        example: John Doe
+        type: string
+      colleague_designation:
+        description: Designation of the colleague
+        example: Team Lead
+        type: string
+      colleague_mobile:
+        description: Mobile number of the colleague
+        example: "9876543212"
+        type: string
+      colleague_name:
+        description: Name of a colleague
+        example: Mark Smith
+        type: string
+      created_by:
+        description: User who created the prospect
+        example: admin
+        type: string
+      created_time:
+        description: Time when the prospect was created
+        example: "2023-04-12T15:04:05Z"
+        type: string
+      emp_id:
+        description: Employee ID
+        example: EMP123
+        type: string
+      employment_type:
+        allOf:
+        - $ref: '#/definitions/models.EmploymentType'
+        description: Employment type ("Employee" or "Business")
+        example: Employee
+      gender:
+        description: Gender of the applicant
+        example: Male
+        type: string
+      gross_salary:
+        description: Gross salary
+        example: 50000
+        type: number
+      mobile_number:
+        description: Mobile number of the applicant
+        example: "9876543210"
+        type: string
+      net_salary:
+        description: Net salary
+        example: 40000
+        type: number
+      number_of_family_members:
+        description: Number of family members
+        example: 4
+        type: integer
+      office_address:
+        description: Office address
+        example: 456 Office Street
+        type: string
+      previous_experience:
+        description: Previous experience
+        example: 5 years in sales
+        type: string
+      prospect_id:
+        description: Unique prospect ID
+        example: P12345
+        type: string
+      reference_mobile:
+        description: Mobile number of the reference
+        example: "9876543211"
+        type: string
+      reference_name:
+        description: Reference name
+        example: Jane Doe
+        type: string
+      reference_relation:
+        description: Relation with the reference
+        example: Sister
+        type: string
+      remarks:
+        description: Additional remarks
+        example: Prospect is under review
+        type: string
+      residential_address:
+        description: Residential address
+        example: 123 Main Street
+        type: string
+      role:
+        description: Role in the organization
+        example: Manager
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/models.ProspectStatus'
+        description: Current status of the prospect
+        example: Pending
+      uid:
+        description: unique identifier for the prospect
+        example: 123e4567-e89b-12d3-a456-426614174111
+        type: string
+      update_history:
+        description: Comments about the last update
+        items:
+          $ref: '#/definitions/models.UpdateHistory'
+        type: array
+      updated_by:
+        description: User who last updated the prospect
+        example: admin
+        type: string
+      updated_time:
+        description: Time when the prospect was last updated
+        example: "2023-04-12T15:04:05Z"
+        type: string
       uploaded_images:
         description: Uploaded images
         example:
@@ -667,7 +807,7 @@ paths:
         name: prospect
         required: true
         schema:
-          $ref: '#/definitions/models.ProspectModel'
+          $ref: '#/definitions/models.ProspecReqtModel'
       produces:
       - application/json
       responses:

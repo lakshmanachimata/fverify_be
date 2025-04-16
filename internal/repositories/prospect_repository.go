@@ -24,17 +24,17 @@ func (r *ProspectRepositoryImpl) Create(ctx context.Context, prospect *models.Pr
 
 func (r *ProspectRepositoryImpl) GetByID(ctx context.Context, id string) (*models.ProspectModel, error) {
 	var prospect models.ProspectModel
-	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&prospect)
+	err := r.collection.FindOne(ctx, bson.M{"uid": id}).Decode(&prospect)
 	return &prospect, err
 }
 
 func (r *ProspectRepositoryImpl) Update(ctx context.Context, prospect *models.ProspectModel) error {
-	_, err := r.collection.UpdateOne(ctx, bson.M{"id": prospect.ID}, bson.M{"$set": prospect})
+	_, err := r.collection.UpdateOne(ctx, bson.M{"uid": prospect.UId}, bson.M{"$set": prospect})
 	return err
 }
 
 func (r *ProspectRepositoryImpl) Delete(ctx context.Context, id string) error {
-	_, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
+	_, err := r.collection.DeleteOne(ctx, bson.M{"uid": id})
 	return err
 }
 

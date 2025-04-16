@@ -326,7 +326,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ProspectModel"
+                            "$ref": "#/definitions/models.ProspecReqtModel"
                         }
                     }
                 ],
@@ -835,6 +835,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.EmploymentType": {
+            "type": "string",
+            "enum": [
+                "Employee",
+                "Business"
+            ],
+            "x-enum-varnames": [
+                "Employee",
+                "Business"
+            ]
+        },
         "models.LoginRequest": {
             "description": "Login request payload containing username and password.",
             "type": "object",
@@ -945,7 +956,7 @@ const docTemplate = `{
                 "OrgInActive"
             ]
         },
-        "models.ProspectModel": {
+        "models.ProspecReqtModel": {
             "description": "Prospect model containing all prospect-related information.",
             "type": "object",
             "properties": {
@@ -981,7 +992,11 @@ const docTemplate = `{
                 },
                 "employment_type": {
                     "description": "Employment type (\"Employee\" or \"Business\")",
-                    "type": "string",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.EmploymentType"
+                        }
+                    ],
                     "example": "Employee"
                 },
                 "gender": {
@@ -993,11 +1008,6 @@ const docTemplate = `{
                     "description": "Gross salary",
                     "type": "number",
                     "example": 50000
-                },
-                "id": {
-                    "description": "Incremental ID",
-                    "type": "integer",
-                    "example": 1
                 },
                 "mobile_number": {
                     "description": "Mobile number of the applicant",
@@ -1067,6 +1077,183 @@ const docTemplate = `{
                         }
                     ],
                     "example": "Pending"
+                },
+                "uploaded_images": {
+                    "description": "Uploaded images",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"image1.jpg\"",
+                        " \"image2.jpg\"]"
+                    ]
+                },
+                "years_in_current_office": {
+                    "description": "Years in the current office",
+                    "type": "integer",
+                    "example": 3
+                },
+                "years_of_stay": {
+                    "description": "Years of stay at the current address",
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "models.ProspectModel": {
+            "description": "Prospect model containing all prospect-related information.",
+            "type": "object",
+            "properties": {
+                "age": {
+                    "description": "Age of the applicant",
+                    "type": "integer",
+                    "example": 30
+                },
+                "applicant_name": {
+                    "description": "Name of the applicant",
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "colleague_designation": {
+                    "description": "Designation of the colleague",
+                    "type": "string",
+                    "example": "Team Lead"
+                },
+                "colleague_mobile": {
+                    "description": "Mobile number of the colleague",
+                    "type": "string",
+                    "example": "9876543212"
+                },
+                "colleague_name": {
+                    "description": "Name of a colleague",
+                    "type": "string",
+                    "example": "Mark Smith"
+                },
+                "created_by": {
+                    "description": "User who created the prospect",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "created_time": {
+                    "description": "Time when the prospect was created",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
+                },
+                "emp_id": {
+                    "description": "Employee ID",
+                    "type": "string",
+                    "example": "EMP123"
+                },
+                "employment_type": {
+                    "description": "Employment type (\"Employee\" or \"Business\")",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.EmploymentType"
+                        }
+                    ],
+                    "example": "Employee"
+                },
+                "gender": {
+                    "description": "Gender of the applicant",
+                    "type": "string",
+                    "example": "Male"
+                },
+                "gross_salary": {
+                    "description": "Gross salary",
+                    "type": "number",
+                    "example": 50000
+                },
+                "mobile_number": {
+                    "description": "Mobile number of the applicant",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "net_salary": {
+                    "description": "Net salary",
+                    "type": "number",
+                    "example": 40000
+                },
+                "number_of_family_members": {
+                    "description": "Number of family members",
+                    "type": "integer",
+                    "example": 4
+                },
+                "office_address": {
+                    "description": "Office address",
+                    "type": "string",
+                    "example": "456 Office Street"
+                },
+                "previous_experience": {
+                    "description": "Previous experience",
+                    "type": "string",
+                    "example": "5 years in sales"
+                },
+                "prospect_id": {
+                    "description": "Unique prospect ID",
+                    "type": "string",
+                    "example": "P12345"
+                },
+                "reference_mobile": {
+                    "description": "Mobile number of the reference",
+                    "type": "string",
+                    "example": "9876543211"
+                },
+                "reference_name": {
+                    "description": "Reference name",
+                    "type": "string",
+                    "example": "Jane Doe"
+                },
+                "reference_relation": {
+                    "description": "Relation with the reference",
+                    "type": "string",
+                    "example": "Sister"
+                },
+                "remarks": {
+                    "description": "Additional remarks",
+                    "type": "string",
+                    "example": "Prospect is under review"
+                },
+                "residential_address": {
+                    "description": "Residential address",
+                    "type": "string",
+                    "example": "123 Main Street"
+                },
+                "role": {
+                    "description": "Role in the organization",
+                    "type": "string",
+                    "example": "Manager"
+                },
+                "status": {
+                    "description": "Current status of the prospect",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProspectStatus"
+                        }
+                    ],
+                    "example": "Pending"
+                },
+                "uid": {
+                    "description": "unique identifier for the prospect",
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174111"
+                },
+                "update_history": {
+                    "description": "Comments about the last update",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UpdateHistory"
+                    }
+                },
+                "updated_by": {
+                    "description": "User who last updated the prospect",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "updated_time": {
+                    "description": "Time when the prospect was last updated",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
                 },
                 "uploaded_images": {
                     "description": "Uploaded images",

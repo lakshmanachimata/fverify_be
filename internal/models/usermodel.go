@@ -32,9 +32,9 @@ const (
 // UpdateHistory represents the history of updates made to a user.
 // @Description History of updates made to a user.
 type UpdateHistory struct {
-	UpdatedComments string    `bson:"updated_comments" json:"updated_comments" example:"Updated user role"` // Comments about the update
-	UpdatedTime     time.Time `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`      // Time of the update
-	UpdateBy        string    `bson:"update_by" json:"update_by" example:"admin"`                           // User who made the update
+	UpdatedComments string `bson:"updated_comments" json:"updated_comments" example:"Updated user role"` // Comments about the update
+	UpdatedTime     string `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`      // Time of the update
+	UpdateBy        string `bson:"update_by" json:"update_by" example:"admin"`                           // User who made the update
 }
 
 // UserModel represents a user in the system.
@@ -97,9 +97,9 @@ type UserReqModel struct {
 //	  "password": "password"
 //	}
 type LoginRequest struct {
-	Username string `json:"username" binding:"required"  binding:"required"  example:"john_doe"` // Username
-	Password string `json:"password" binding:"required"  binding:"required"  example:"password"` // Password
-	OrgId    string `json:"orgId" binding:"required"  binding:"required"  example:"123456"`      // Organization ID
+	Username string `json:"username" binding:"required"   example:"john_doe"`  // Username
+	Password string `json:"password" binding:"required"    example:"password"` // Password
+	OrgId    string `json:"orgId" binding:"required"   example:"123456"`       // Organization ID
 }
 
 // LoginResponse represents the response payload for the login API.

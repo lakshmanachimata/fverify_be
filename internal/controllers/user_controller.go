@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
+	"time"
 
 	"fverify_be/internal/auth"
 	"fverify_be/internal/models"
@@ -136,6 +138,11 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = reqUser.OrgUUID
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"User created"}, ", "),
+		UpdateBy:        authUser.Username,
+	})
 
 	user.UId = uuid.New().String()
 
@@ -334,7 +341,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = reqUser.OrgUUID
 
-	err = uc.Service.UpdateUser(c.Request.Context(), &user)
+	err = uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
@@ -512,7 +519,11 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = reqUser.OrgUUID
 	user.UId = uuid.New().String()
-
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"Admin created"}, ", "),
+		UpdateBy:        "System",
+	})
 	// Ensure the role is set to Admin
 	user.Role = models.Admin
 
@@ -576,7 +587,11 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = reqUser.OrgUUID
 	user.UId = uuid.New().String()
-
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"Owner created"}, ", "),
+		UpdateBy:        "System",
+	})
 	// Ensure the role is set to Admin
 	user.Role = models.Owner
 
