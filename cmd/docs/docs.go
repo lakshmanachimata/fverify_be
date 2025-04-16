@@ -402,6 +402,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/prospects/{uid}": {
+            "put": {
+                "description": "Update an existing prospect in the system. Update comments are generated based on differences from the earlier prospect state.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prospects"
+                ],
+                "summary": "Update an existing prospect",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Prospect UId",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated prospect data",
+                        "name": "prospect",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProspecReqtModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ProspectModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Retrieve all users in the system",
@@ -420,6 +479,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Bearer token",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "orgId",
+                        "name": "Organisation",
                         "in": "header",
                         "required": true
                     }
@@ -465,6 +531,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Bearer token",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "orgId",
+                        "name": "Organisation",
                         "in": "header",
                         "required": true
                     },
@@ -646,6 +719,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "orgId",
+                        "name": "Organisation",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "User uId",
                         "name": "uId",
                         "in": "path",
@@ -713,6 +793,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Bearer token",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "orgId",
+                        "name": "Organisation",
                         "in": "header",
                         "required": true
                     },

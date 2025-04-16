@@ -859,6 +859,46 @@ paths:
       summary: Get a prospect by ID
       tags:
       - Prospects
+  /prospects/{uid}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing prospect in the system. Update comments are
+        generated based on differences from the earlier prospect state.
+      parameters:
+      - description: Prospect UId
+        in: path
+        name: uid
+        required: true
+        type: string
+      - description: Updated prospect data
+        in: body
+        name: prospect
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProspecReqtModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProspectModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Update an existing prospect
+      tags:
+      - Prospects
   /users:
     get:
       consumes:
@@ -868,6 +908,11 @@ paths:
       - description: Bearer token
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: orgId
+        in: header
+        name: Organisation
         required: true
         type: string
       produces:
@@ -898,6 +943,11 @@ paths:
       - description: Bearer token
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: orgId
+        in: header
+        name: Organisation
         required: true
         type: string
       - description: User data (all fields are mandatory)
@@ -937,6 +987,11 @@ paths:
       - description: Bearer token
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: orgId
+        in: header
+        name: Organisation
         required: true
         type: string
       - description: User ID
@@ -1057,6 +1112,11 @@ paths:
       - description: Bearer token
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: orgId
+        in: header
+        name: Organisation
         required: true
         type: string
       - description: User uId

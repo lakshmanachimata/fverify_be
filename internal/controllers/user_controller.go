@@ -268,7 +268,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param Organisation Id header string true "orgId"
+// @Param Organisation header string true "orgId"
 // @Param uId path string true "User uId"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 200 {object} models.UserModel
