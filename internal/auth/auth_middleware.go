@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
@@ -42,12 +43,9 @@ func AuthMiddleware(requiredRoles ...string) gin.HandlerFunc {
 	}
 }
 
-const apiKey = "059d987b-5f42-44df-a13c-f7042fca0bb1"       // Replace with a secure API key
-const orgAPIKey = "059d987b-5f42-44df-a13c-f7042fca0bb2"    // Replace with a secure API key
-const getOrgAPIKey = "059d987b-5f42-44df-a13c-f7042fca0bb3" // Replace with a secure API key
-
 func APIKeyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		apiKey := viper.GetString("apikeys.userAPIKey")
 		// Extract the API key from the header
 		providedKey := c.GetHeader("X-API-Key")
 		if providedKey != apiKey {
@@ -61,6 +59,7 @@ func APIKeyMiddleware() gin.HandlerFunc {
 
 func OrgAPIKeyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		orgAPIKey := viper.GetString("apikeys.orgAPIKey")
 		// Extract the API key from the header
 		providedKey := c.GetHeader("X-API-Key")
 		if providedKey != orgAPIKey {
@@ -74,6 +73,7 @@ func OrgAPIKeyMiddleware() gin.HandlerFunc {
 
 func GetOrgAPIKeyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		getOrgAPIKey := viper.GetString("apikeys.getOrgAPIKey")
 		// Extract the API key from the header
 		providedKey := c.GetHeader("X-API-Key")
 		if providedKey != getOrgAPIKey {
