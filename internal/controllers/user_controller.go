@@ -59,7 +59,7 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param user body models.UserReqModel true "User data"
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
@@ -71,6 +71,23 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	var reqUser models.UserReqModel
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate orgUUID
+	if reqUser.OrgUUID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
 		return
 	}
 
@@ -242,7 +259,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param uId path string true "User uId"
-// @Param user body models.UserModel true "Updated user data"
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
@@ -463,6 +480,24 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
+
+	// Validate orgUUID
+	if reqUser.OrgUUID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
+		return
+	}
+
 	var user models.UserModel
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
@@ -497,7 +532,7 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param X-API-Key header string true "API key"
-// @Param user body models.UserReqModel true "Admin user data"
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
@@ -507,6 +542,23 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	var reqUser models.UserReqModel
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Validate orgUUID
+	if reqUser.OrgUUID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
 		return
 	}
 

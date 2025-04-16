@@ -269,7 +269,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Admin user data",
+                        "description": "User data (all fields are mandatory)",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -469,7 +469,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "User data",
+                        "description": "User data (all fields are mandatory)",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -652,12 +652,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated user data",
+                        "description": "User data (all fields are mandatory)",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserReqModel"
                         }
                     }
                 ],
@@ -1247,6 +1247,20 @@ const docTemplate = `{
         },
         "models.UserReqModel": {
             "type": "object",
+            "required": [
+                "created_time",
+                "mobile_number",
+                "org_status",
+                "org_uuid",
+                "password",
+                "remarks",
+                "role",
+                "status",
+                "update_history",
+                "updated_time",
+                "userid",
+                "username"
+            ],
             "properties": {
                 "created_time": {
                     "description": "Time when the user was created",

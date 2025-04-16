@@ -424,6 +424,19 @@ definitions:
         description: Username of the user
         example: john_doe
         type: string
+    required:
+    - created_time
+    - mobile_number
+    - org_status
+    - org_uuid
+    - password
+    - remarks
+    - role
+    - status
+    - update_history
+    - updated_time
+    - userid
+    - username
     type: object
   models.UserStatus:
     enum:
@@ -615,7 +628,7 @@ paths:
         name: X-API-Key
         required: true
         type: string
-      - description: Admin user data
+      - description: User data (all fields are mandatory)
         in: body
         name: user
         required: true
@@ -747,7 +760,7 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: User data
+      - description: User data (all fields are mandatory)
         in: body
         name: user
         required: true
@@ -911,12 +924,12 @@ paths:
         name: uId
         required: true
         type: string
-      - description: Updated user data
+      - description: User data (all fields are mandatory)
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserModel'
+          $ref: '#/definitions/models.UserReqModel'
       produces:
       - application/json
       responses:
