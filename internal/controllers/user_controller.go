@@ -61,6 +61,7 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param Organisation  header string true "orgId"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -162,6 +163,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param Organisation header string true "orgId"
 // @Param userId path int true "User ID"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -187,6 +189,7 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param Organisation  header string true "orgId"
 // @Success 200 {array} models.UserModel
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
@@ -265,6 +268,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param Organisation Id header string true "orgId"
 // @Param uId path string true "User uId"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 200 {object} models.UserModel

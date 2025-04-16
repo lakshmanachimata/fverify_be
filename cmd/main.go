@@ -163,6 +163,7 @@ func main() {
 	// @Description Create a new user in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
 	// @Accept json
 	// @Produce json
 	// @Param user body models.UserReqModel true "User data"
@@ -176,6 +177,7 @@ func main() {
 	// @Description Update an existing user's details
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
 	// @Accept json
 	// @Produce json
 	// @Param uId path int true "User uId"
@@ -191,6 +193,7 @@ func main() {
 	// @Description Retrieve all users in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
 	// @Accept json
 	// @Produce json
 	// @Success 200 {array} models.UserModel
@@ -202,6 +205,7 @@ func main() {
 	// @Description Retrieve a user by their unique ID
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
 	// @Accept json
 	// @Produce json
 	// @Param userId path string true "User ID"
@@ -292,28 +296,47 @@ func main() {
 
 	// Prospect APIs
 	// @Summary Create a new prospect
-	// @Description Create a new prospect in the system
+	// @Description Create a new prospect in the user
 	// @Tags Prospects
 	// @Accept json
 	// @Produce json
-	// @Param prospect body models.ProspectModel true "Prospect data"
+	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
+	// @Param prospect body models.ProspecReqtModel true "Prospect data"
 	// @Success 201 {object} gin.H{"message": "Prospect created"}
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /prospects [post]
-	router.POST("/prospects", prospectController.CreateProspect)
+	router.POST("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead"), prospectController.CreateProspect)
 
 	// @Summary Get a prospect by ID
 	// @Description Retrieve a prospect by their unique ID
 	// @Tags Prospects
 	// @Accept json
 	// @Produce json
+	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
 	// @Param id path string true "Prospect ID"
 	// @Success 200 {object} models.ProspectModel
 	// @Failure 400 {object} gin.H{"error": "Invalid prospect ID"}
 	// @Failure 404 {object} gin.H{"error": "Prospect not found"}
 	// @Router /prospects/{id} [get]
-	router.GET("/prospects/:id", prospectController.GetProspect)
+	router.GET("/prospects/:id", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
+
+	// Prospect APIs
+	// @Summary Create a new prospect
+	// @Description Update  prospect in the user
+	// @Tags Prospects
+	// @Accept json
+	// @Produce json
+	// @Param Authorization header string true "Bearer token"
+	// @Param Organisation Id header string true "orgId"
+	// @Param prospect body models.ProspecReqtModel true "Prospect data"
+	// @Success 201 {object} gin.H{"message": "Prospect created"}
+	// @Failure 400 {object} gin.H{"error": "Bad Request"}
+	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+	// @Router /prospects [post]
+	router.PUT("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.UpdateProspect)
 
 	// Start the server
 	if err := router.Run(":9000"); err != nil {
