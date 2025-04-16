@@ -104,8 +104,8 @@ definitions:
         type: string
       uid:
         description: User's unique ID
-        example: 1
-        type: integer
+        example: "1"
+        type: string
       userId:
         description: User's unique identifier
         example: "12345"
@@ -366,8 +366,8 @@ definitions:
         example: Active
       uid:
         description: Auto-incremented unique identifier
-        example: 1
-        type: integer
+        example: 123e4567-e89b-12d3-a456-426614174111
+        type: string
       update_history:
         description: History of updates
         items:
@@ -906,7 +906,7 @@ paths:
         in: path
         name: uId
         required: true
-        type: integer
+        type: string
       - description: Updated user data
         in: body
         name: user

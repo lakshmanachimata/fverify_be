@@ -645,7 +645,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User uId",
                         "name": "uId",
                         "in": "path",
@@ -1081,8 +1081,8 @@ const docTemplate = `{
                 },
                 "uid": {
                     "description": "User's unique ID",
-                    "type": "integer",
-                    "example": 1
+                    "type": "string",
+                    "example": "1"
                 },
                 "userId": {
                     "description": "User's unique identifier",
@@ -1425,8 +1425,8 @@ const docTemplate = `{
                 },
                 "uid": {
                     "description": "Auto-incremented unique identifier",
-                    "type": "integer",
-                    "example": 1
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174111"
                 },
                 "update_history": {
                     "description": "History of updates",
