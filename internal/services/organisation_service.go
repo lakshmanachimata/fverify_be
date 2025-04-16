@@ -23,9 +23,9 @@ func (s *OrganisationService) UpdateOrganisation(ctx context.Context, orgId stri
 	return s.repo.Update(ctx, orgId, org)
 }
 
-//	func (s *OrganisationService) DeleteOrganisation(ctx context.Context, orgId string) error {
-//		return s.repo.Delete(ctx, orgId)
-//	}
+func (s *OrganisationService) DeleteOrganisation(ctx context.Context, orgId string) error {
+	return s.repo.Delete(ctx, orgId)
+}
 func (s *OrganisationService) GetAllOrganisations(ctx context.Context) ([]*models.Organisation, error) {
 	return s.repo.GetAllOrganisations(ctx)
 }

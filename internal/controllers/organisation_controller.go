@@ -117,17 +117,17 @@ func (oc *OrganisationController) UpdateOrganisation(c *gin.Context) {
 // // @Failure 404 {object} NotFoundResponse
 // // @Failure 500 {object} InternalErrorResponse
 // // @Router /organisations/{orgId} [delete]
-// func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
-// 	orgId := c.Param("org_id")
+func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
+	orgId := c.Param("org_id")
 
-// 	err := oc.Service.DeleteOrganisation(c.Request.Context(), orgId)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete organisation"})
-// 		return
-// 	}
+	err := oc.Service.DeleteOrganisation(c.Request.Context(), orgId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete organisation"})
+		return
+	}
 
-// 	c.Status(http.StatusNoContent)
-// }
+	c.Status(http.StatusNoContent)
+}
 
 // GetAllOrganisations godoc
 // @Summary Get all organisations

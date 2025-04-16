@@ -912,41 +912,6 @@ paths:
       tags:
       - Users
   /users/uid/{uId}:
-    delete:
-      description: Delete a user by their unique uId
-      parameters:
-      - description: User uId
-        in: path
-        name: uId
-        required: true
-        type: integer
-      - description: Bearer token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/controllers.InvalidAuthResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controllers.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-      summary: Delete a user by uId
-      tags:
-      - Users
     put:
       consumes:
       - application/json
@@ -1044,42 +1009,6 @@ paths:
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Set a user's password
-      tags:
-      - Users
-  /users/userid/{userId}:
-    delete:
-      description: Delete a user by their unique userId
-      parameters:
-      - description: User userId
-        in: path
-        name: userId
-        required: true
-        type: string
-      - description: Bearer token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/controllers.InvalidAuthResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controllers.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.InternalErrorResponse'
-      summary: Delete a user by userId
       tags:
       - Users
 schemes:

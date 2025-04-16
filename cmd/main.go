@@ -220,7 +220,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/uid/{uId} [delete]
-	router.DELETE("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUId)
+	// router.DELETE("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUId)
 
 	// @Summary Delete a user by userId
 	// @Description Delete a user by their unique userId
@@ -231,7 +231,7 @@ func main() {
 	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
 	// @Failure 404 {object} gin.H{"error": "User not found"}
 	// @Router /users/userid/{userId} [delete]
-	router.DELETE("/users/userid/:userId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUserId)
+	// router.DELETE("/users/userid/:userId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.DeleteUserByUserId)
 
 	// @Summary Set a user's password
 	// @Description Set a new password for a user
