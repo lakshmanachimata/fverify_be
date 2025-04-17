@@ -374,11 +374,11 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	// Check if the organisation exists and is active
 	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
 	if existingOrg == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation, please contact support"})
 		return
 	}
 	if !isActive {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid organisation"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid organisation, please contact support"})
 		return
 	}
 
@@ -390,7 +390,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	}
 
 	if user.Status == models.InActive {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is inactive"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Your account is inactive, please contact support"})
 		return
 	}
 	// Update user status to Active
