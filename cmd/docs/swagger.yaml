@@ -530,23 +530,19 @@ definitions:
     type: object
   models.UserReqModel:
     properties:
-      created_time:
-        description: Time when the user was created
-        example: "2023-04-12T15:04:05Z"
-        type: string
       mobile_number:
         description: Mobile number of the user
         example: "9876543210"
+        type: string
+      org_id:
+        description: UUID of the organization
+        example: "123456"
         type: string
       org_status:
         allOf:
         - $ref: '#/definitions/models.OrganisationStatus'
         description: Organization ID
         example: "123456"
-      org_uuid:
-        description: UUID of the organization
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
       password:
         description: Hashed password
         example: plane_password
@@ -565,15 +561,6 @@ definitions:
         - $ref: '#/definitions/models.UserStatus'
         description: Status of the user
         example: Active
-      update_history:
-        description: History of updates
-        items:
-          $ref: '#/definitions/models.UpdateHistory'
-        type: array
-      updated_time:
-        description: Time when the user was last updated
-        example: "2023-04-12T15:04:05Z"
-        type: string
       userid:
         description: Unique identifier for the user
         example: "112345"
@@ -583,16 +570,13 @@ definitions:
         example: john_doe
         type: string
     required:
-    - created_time
     - mobile_number
+    - org_id
     - org_status
-    - org_uuid
     - password
     - remarks
     - role
     - status
-    - update_history
-    - updated_time
     - userid
     - username
     type: object

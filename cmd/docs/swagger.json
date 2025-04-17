@@ -1586,29 +1586,26 @@
         "models.UserReqModel": {
             "type": "object",
             "required": [
-                "created_time",
                 "mobile_number",
+                "org_id",
                 "org_status",
-                "org_uuid",
                 "password",
                 "remarks",
                 "role",
                 "status",
-                "update_history",
-                "updated_time",
                 "userid",
                 "username"
             ],
             "properties": {
-                "created_time": {
-                    "description": "Time when the user was created",
-                    "type": "string",
-                    "example": "2023-04-12T15:04:05Z"
-                },
                 "mobile_number": {
                     "description": "Mobile number of the user",
                     "type": "string",
                     "example": "9876543210"
+                },
+                "org_id": {
+                    "description": "UUID of the organization",
+                    "type": "string",
+                    "example": "123456"
                 },
                 "org_status": {
                     "description": "Organization ID",
@@ -1618,11 +1615,6 @@
                         }
                     ],
                     "example": "123456"
-                },
-                "org_uuid": {
-                    "description": "UUID of the organization",
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
                 },
                 "password": {
                     "description": "Hashed password",
@@ -1651,18 +1643,6 @@
                         }
                     ],
                     "example": "Active"
-                },
-                "update_history": {
-                    "description": "History of updates",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.UpdateHistory"
-                    }
-                },
-                "updated_time": {
-                    "description": "Time when the user was last updated",
-                    "type": "string",
-                    "example": "2023-04-12T15:04:05Z"
                 },
                 "userid": {
                     "description": "Unique identifier for the user",

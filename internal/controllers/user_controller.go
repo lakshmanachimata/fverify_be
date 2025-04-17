@@ -78,14 +78,14 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	}
 
 	// Validate orgUUID
-	if reqUser.OrgUUID == "" {
+	if reqUser.Org_Id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}
@@ -132,13 +132,13 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	user.Password = reqUser.Password
 	user.Role = reqUser.Role
 	user.Status = reqUser.Status
-	user.CreatedTime = reqUser.CreatedTime
-	user.UpdatedTime = reqUser.UpdatedTime
-	user.UpdateHistory = reqUser.UpdateHistory
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
-	user.OrgUUID = reqUser.OrgUUID
+	user.OrgUUID = authUser.OrgUUID
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+
 	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
 		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
 		UpdatedComments: strings.Join([]string{"User created"}, ", "),
@@ -339,13 +339,10 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	user.Password = reqUser.Password
 	user.Role = reqUser.Role
 	user.Status = reqUser.Status
-	user.CreatedTime = reqUser.CreatedTime
-	user.UpdatedTime = reqUser.UpdatedTime
-	user.UpdateHistory = reqUser.UpdateHistory
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
-	user.OrgUUID = reqUser.OrgUUID
+	user.OrgUUID = authUser.OrgUUID
 
 	err = uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
 	if err != nil {
@@ -376,8 +373,8 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}
@@ -387,7 +384,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	}
 
 	// Validate the user
-	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password, loginRequest.OrgId)
+	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password, existingOrg.OrgUUID)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
@@ -496,14 +493,14 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 	}
 
 	// Validate orgUUID
-	if reqUser.OrgUUID == "" {
+	if reqUser.Org_Id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}
@@ -518,14 +515,15 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 	user.Password = reqUser.Password
 	user.Role = reqUser.Role
 	user.Status = reqUser.Status
-	user.CreatedTime = reqUser.CreatedTime
-	user.UpdatedTime = reqUser.UpdatedTime
-	user.UpdateHistory = reqUser.UpdateHistory
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
-	user.OrgUUID = reqUser.OrgUUID
+	user.OrgUUID = existingOrg.OrgUUID
 	user.UId = uuid.New().String()
+
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+
 	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
 		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
 		UpdatedComments: strings.Join([]string{"Admin created"}, ", "),
@@ -564,14 +562,14 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	}
 
 	// Validate orgUUID
-	if reqUser.OrgUUID == "" {
+	if reqUser.Org_Id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.OrgUUID)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}
@@ -586,14 +584,15 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	user.Password = reqUser.Password
 	user.Role = reqUser.Role
 	user.Status = reqUser.Status
-	user.CreatedTime = reqUser.CreatedTime
-	user.UpdatedTime = reqUser.UpdatedTime
-	user.UpdateHistory = reqUser.UpdateHistory
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgStatus = reqUser.OrgStatus
-	user.OrgUUID = reqUser.OrgUUID
+	user.OrgUUID = existingOrg.OrgUUID
 	user.UId = uuid.New().String()
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+	// Set the update history
+
 	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
 		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
 		UpdatedComments: strings.Join([]string{"Owner created"}, ", "),

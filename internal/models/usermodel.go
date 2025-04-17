@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 // Role represents the role of a user.
 // Enum: "Admin", "Operations Lead", "Field Lead", "Field Executive", "Owner", "Operations Executive"
 type Role string
@@ -57,7 +55,7 @@ type UpdateHistory struct {
 //		    }
 //		  ],
 //		  "remarks": "User is active and verified",
-//		  "OrgUUID": "123e4567-e89b-12d3-a456-426614174000"
+//		  "org_uuid": "123e4567-e89b-12d3-a456-426614174000"
 //		}
 type UserModel struct {
 	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
@@ -66,8 +64,8 @@ type UserModel struct {
 	Password      string             `bson:"password" json:"password" example:"plane_password"`                       // Hashed password
 	Role          Role               `bson:"role" json:"role" example:"Admin"`                                        // Role of the user
 	Status        UserStatus         `bson:"status" json:"status" example:"Active"`                                   // Status of the user
-	CreatedTime   time.Time          `bson:"created_time" json:"created_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was created
-	UpdatedTime   time.Time          `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was last updated
+	CreatedTime   string             `bson:"created_time" json:"created_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was created
+	UpdatedTime   string             `bson:"updated_time" json:"updated_time" example:"2023-04-12T15:04:05Z"`         // Time when the user was last updated
 	UpdateHistory []UpdateHistory    `bson:"update_history" json:"update_history"`                                    // History of updates
 	Remarks       string             `bson:"remarks" json:"remarks" example:"User is active and verified"`            // Additional remarks about the user
 	MobileNumber  string             `bson:"mobile_number" json:"mobile_number" example:"9876543210"`                 // Mobile number of the user
@@ -84,32 +82,21 @@ type UserModel struct {
 //		  "password": "plane_password",
 //		  "role": "Admin",
 //		  "status": "Active",
-//		  "created_time": "2023-04-12T15:04:05Z",
-//		  "updated_time": "2023-04-12T15:04:05Z",
 //	   	  "mobile_number": "9876543210",
-//		  "update_history": [
-//		    {
-//		      "updated_comments": "Updated user role",
-//		      "updated_time": "2023-04-12T15:04:05Z"
-//		    }
-//		  ],
 //		  "remarks": "User is active and verified",
-//		  "OrgUUID": "123e4567-e89b-12d3-a456-426614174000"
+//		  "org_id": "123e4567-e89b-12d3-a456-426614174000"
 //		}
 
 type UserReqModel struct {
-	UserId        string             `bson:"userid" json:"userid" binding:"required" example:"112345"`                                    // Unique identifier for the user
-	Username      string             `bson:"username" json:"username"  binding:"required" example:"john_doe"`                             // Username of the user
-	Password      string             `bson:"password" json:"password"  binding:"required" example:"plane_password"`                       // Hashed password
-	Role          Role               `bson:"role" json:"role"  binding:"required" example:"Admin"`                                        // Role of the user
-	Status        UserStatus         `bson:"status" json:"status"  binding:"required" example:"Active"`                                   // Status of the user
-	CreatedTime   time.Time          `bson:"created_time" json:"created_time"  binding:"required" example:"2023-04-12T15:04:05Z"`         // Time when the user was created
-	UpdatedTime   time.Time          `bson:"updated_time" json:"updated_time"  binding:"required" example:"2023-04-12T15:04:05Z"`         // Time when the user was last updated
-	UpdateHistory []UpdateHistory    `bson:"update_history" json:"update_history"  binding:"required" `                                   // History of updates
-	Remarks       string             `bson:"remarks" json:"remarks"  binding:"required" example:"User is active and verified"`            // Additional remarks about the user
-	MobileNumber  string             `bson:"mobile_number" json:"mobile_number"  binding:"required" example:"9876543210"`                 // Mobile number of the user
-	OrgStatus     OrganisationStatus `bson:"org_status" json:"org_status"  binding:"required" example:"123456"`                           // Organization ID
-	OrgUUID       string             `bson:"org_uuid" json:"org_uuid"  binding:"required" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
+	UserId       string             `bson:"userid" json:"userid" binding:"required" example:"112345"`                         // Unique identifier for the user
+	Username     string             `bson:"username" json:"username"  binding:"required" example:"john_doe"`                  // Username of the user
+	Password     string             `bson:"password" json:"password"  binding:"required" example:"plane_password"`            // Hashed password
+	Role         Role               `bson:"role" json:"role"  binding:"required" example:"Admin"`                             // Role of the user
+	Status       UserStatus         `bson:"status" json:"status"  binding:"required" example:"Active"`                        // Status of the user
+	Remarks      string             `bson:"remarks" json:"remarks"  binding:"required" example:"User is active and verified"` // Additional remarks about the user
+	MobileNumber string             `bson:"mobile_number" json:"mobile_number"  binding:"required" example:"9876543210"`      // Mobile number of the user
+	OrgStatus    OrganisationStatus `bson:"org_status" json:"org_status"  binding:"required" example:"123456"`                // Organization ID
+	Org_Id       string             `bson:"org_id" json:"org_id"  binding:"required" example:"123456"`                        // UUID of the organization
 }
 
 // LoginRequest represents the request payload for the login API.

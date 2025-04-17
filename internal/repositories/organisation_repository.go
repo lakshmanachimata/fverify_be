@@ -59,16 +59,16 @@ func (r *OrganisationRepository) GetAllOrganisations(ctx context.Context) ([]*mo
 	}
 	return organisations, nil
 }
-func (r *OrganisationRepository) IsOrgActive(ctx context.Context, org_id string) (bool, error) {
+func (r *OrganisationRepository) IsOrgActive(ctx context.Context, org_id string) (bool, *models.Organisation) {
 	var org models.Organisation
 	err := r.collection.FindOne(ctx, bson.M{"org_id": org_id, "status": models.Active}).Decode(&org)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return false, nil
 		}
-		return false, err
+		return false, nil
 	}
-	return true, nil
+	return true, &org
 }
 func (r *OrganisationRepository) GetOrganisationByID(ctx context.Context, org_id string) (*models.Organisation, error) {
 	var org models.Organisation

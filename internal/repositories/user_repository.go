@@ -72,11 +72,6 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 		return nil, err
 	}
 	user.Password = hashedPassword // Set the hashed password
-
-	// Set CreatedTime and UpdatedTime
-	user.CreatedTime = time.Now()
-	user.UpdatedTime = time.Now()
-
 	// Insert the user into the collection
 	result, err := r.collection.InsertOne(ctx, user)
 	if err != nil {
@@ -164,7 +159,7 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel,
 		updateComments = append(updateComments, "mobile number changed from '"+eUser.MobileNumber+"' to '"+user.MobileNumber+"'")
 	}
 
-	user.UpdatedTime = time.Now()
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
 	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
 		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
 		UpdatedComments: strings.Join(updateComments, ", "),

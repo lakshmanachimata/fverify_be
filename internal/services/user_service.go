@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"time"
 
 	"fverify_be/internal/models"
 
@@ -18,8 +17,6 @@ func NewUserService(repo *repositories.UserRepositoryImpl) *UserService {
 }
 
 func (s *UserService) CreateUser(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
-	user.CreatedTime = time.Now()
-	user.UpdatedTime = time.Now()
 	user.Status = models.Created
 	return s.repo.Create(ctx, user)
 }
