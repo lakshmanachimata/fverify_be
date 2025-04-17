@@ -145,7 +145,7 @@ func main() {
 	// @Success 200 {array} models.Organisation
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /organisations [get]
-	router.GET("/organisations", auth.GetOrgAPIKeyMiddleware(), organisationController.GetAllOrganisations)
+	router.GET("/organisations", auth.OrgAPIKeyMiddleware(), organisationController.GetAllOrganisations)
 
 	// @Summary Login a user
 	// @Description Validate username and password, and return user details with a token

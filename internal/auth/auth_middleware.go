@@ -117,17 +117,3 @@ func OrgAPIKeyMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-func GetOrgAPIKeyMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		getOrgAPIKey := viper.GetString("apikeys.getOrgAPIKey")
-		// Extract the API key from the header
-		providedKey := c.GetHeader("X-API-Key")
-		if providedKey != getOrgAPIKey {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid API key"})
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
-}
