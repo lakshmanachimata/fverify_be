@@ -87,6 +87,15 @@ const docTemplate = `{
                     "Organisations"
                 ],
                 "summary": "Get all organisations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -321,6 +330,20 @@ const docTemplate = `{
                 "summary": "Create a new prospect",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "orgId",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Prospect data",
                         "name": "prospect",
                         "in": "body",
@@ -368,9 +391,23 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Prospect ID",
-                        "name": "id",
+                        "description": "Prospect UID",
+                        "name": "uid",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "orgId",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -421,6 +458,20 @@ const docTemplate = `{
                         "description": "Prospect UId",
                         "name": "uid",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "orgId",
+                        "in": "header",
                         "required": true
                     },
                     {
@@ -484,8 +535,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "orgId",
-                        "name": "Organisation",
+                        "description": "Organisation Id",
+                        "name": "orgId",
                         "in": "header",
                         "required": true
                     }
@@ -536,8 +587,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "orgId",
-                        "name": "Organisation",
+                        "description": "Organisation Id",
+                        "name": "orgId",
                         "in": "header",
                         "required": true
                     },
@@ -644,15 +695,6 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user roles",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Organisation ID",
-                        "name": "orgId",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -719,8 +761,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "orgId",
-                        "name": "Organisation",
+                        "description": "Organisation Id",
+                        "name": "orgId",
                         "in": "header",
                         "required": true
                     },
@@ -798,8 +840,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "orgId",
-                        "name": "Organisation",
+                        "description": "Organisation Id",
+                        "name": "orgId",
                         "in": "header",
                         "required": true
                     },

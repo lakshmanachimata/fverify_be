@@ -141,6 +141,7 @@ func main() {
 	// @Tags Organisations
 	// @Accept json
 	// @Produce json
+	// @Param X-API-Key header string true "API key"
 	// @Success 200 {array} models.Organisation
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /organisations [get]
@@ -163,7 +164,7 @@ func main() {
 	// @Description Create a new user in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param user body models.UserReqModel true "User data"
@@ -177,7 +178,7 @@ func main() {
 	// @Description Update an existing user's details
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param uId path int true "User uId"
@@ -193,7 +194,7 @@ func main() {
 	// @Description Retrieve all users in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Success 200 {array} models.UserModel
@@ -205,7 +206,7 @@ func main() {
 	// @Description Retrieve a user by their unique ID
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param userId path string true "User ID"
@@ -219,6 +220,7 @@ func main() {
 	// @Description Delete a user by their unique uId
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param orgId  header string true "Organisation Id"
 	// @Param uId path int true "User uId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
@@ -230,6 +232,7 @@ func main() {
 	// @Description Delete a user by their unique userId
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
+	// @Param orgId  header string true "Organisation Id"
 	// @Param userId path string true "User userId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
@@ -243,6 +246,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
+	// @Param orgId  header string true "Organisation Id"
 	// @Param uId path int true "User uId"
 	// @Param password body models.SetPasswordRequest true "New password"
 	// @Success 200 {object} gin.H{"message": "Password updated successfully"}
@@ -301,7 +305,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Param prospect body models.ProspecReqtModel true "Prospect data"
 	// @Success 201 {object} gin.H{"message": "Prospect created"}
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
@@ -315,13 +319,13 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
-	// @Param id path string true "Prospect ID"
+	// @Param orgId  header string true "Organisation Id"
+	// @Param uid path string true "Prospect ID"
 	// @Success 200 {object} models.ProspectModel
 	// @Failure 400 {object} gin.H{"error": "Invalid prospect ID"}
 	// @Failure 404 {object} gin.H{"error": "Prospect not found"}
 	// @Router /prospects/{id} [get]
-	router.GET("/prospects/:id", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
+	router.GET("/prospects/:uid", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
 
 	// Prospect APIs
 	// @Summary Create a new prospect
@@ -330,7 +334,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param Organisation Id header string true "orgId"
+	// @Param orgId  header string true "Organisation Id"
 	// @Param prospect body models.ProspecReqtModel true "Prospect data"
 	// @Success 201 {object} gin.H{"message": "Prospect created"}
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}

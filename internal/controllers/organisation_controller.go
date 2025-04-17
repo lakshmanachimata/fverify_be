@@ -135,6 +135,7 @@ func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
 // @Tags Organisations
 // @Accept json
 // @Produce json
+// @Param X-API-Key header string true "API key"
 // @Success 200 {array} models.Organisation
 // @Failure 401 {object} InvalidAPIKeyResponse
 // @Failure 404 {object} NotFoundResponse

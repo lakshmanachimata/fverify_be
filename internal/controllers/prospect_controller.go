@@ -26,6 +26,8 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Tags Prospects
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param orgId  header string true "Organisation Id"
 // @Param prospect body models.ProspecReqtModel true "Prospect data"
 // @Success 201 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
@@ -94,15 +96,17 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Tags Prospects
 // @Accept json
 // @Produce json
-// @Param id path string true "Prospect ID"
+// @Param uid path string true "Prospect UID"
+// @Param Authorization header string true "Bearer token"
+// @Param orgId  header string true "Organisation Id"
 // @Success 200 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /prospects/{id} [get]
 func (pc *ProspectController) GetProspect(c *gin.Context) {
-	id := c.Param("id")
-	prospect, err := pc.Service.GetProspectByID(c.Request.Context(), id)
+	uid := c.Param("uid")
+	prospect, err := pc.Service.GetProspectByID(c.Request.Context(), uid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Prospect not found"})
 		return
@@ -118,6 +122,8 @@ func (pc *ProspectController) GetProspect(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param uid path string true "Prospect UId"
+// @Param Authorization header string true "Bearer token"
+// @Param orgId  header string true "Organisation Id"
 // @Param prospect body models.ProspecReqtModel true "Updated prospect data"
 // @Success 200 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
