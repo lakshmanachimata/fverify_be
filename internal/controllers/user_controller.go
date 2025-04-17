@@ -389,6 +389,10 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		return
 	}
 
+	if user.Status == models.InActive {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is inactive"})
+		return
+	}
 	// Update user status to Active
 	if user.Status != models.Active {
 		err = uc.Service.UpdateUserStatus(c.Request.Context(), user.UserId, string(models.Active))
