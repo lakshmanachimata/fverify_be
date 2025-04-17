@@ -625,6 +625,7 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param org_id  header string true "Organisation Id"
 // @Success 200 {array} string
 // @Failure 400 {object} ErrorResponse
 // @Failure 403 {object} ErrorResponse
@@ -633,15 +634,15 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/users/roles [get]
 func (uc *UserController) GetUserRoles(c *gin.Context) {
-	org_id := c.Query("org_id")
+	org_id := c.GetHeader("org_id")
 	if org_id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}

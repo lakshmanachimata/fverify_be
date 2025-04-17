@@ -695,6 +695,15 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user roles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
