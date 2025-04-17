@@ -64,7 +64,7 @@ func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId string, newPas
 	return err
 }
 
-func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserModel, error) {
+func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserRespModel, error) {
 	// Generate the next unique ID (uId)
 	// Hash the password
 	hashedPassword, err := HashPassword(user.Password)
@@ -85,17 +85,31 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 		return nil, err
 	}
 
-	return &createdUser, nil
+	// Convert to UserRespModel
+	createdUserResp := models.UserRespModel{
+		UId:           createdUser.UId,
+		UserId:        createdUser.UserId,
+		Username:      createdUser.Username,
+		Role:          createdUser.Role,
+		Status:        createdUser.Status,
+		MobileNumber:  createdUser.MobileNumber,
+		Remarks:       createdUser.Remarks,
+		OrgUUID:       createdUser.OrgUUID,
+		CreatedTime:   createdUser.CreatedTime,
+		OrgStatus:     createdUser.OrgStatus,
+		UpdatedTime:   createdUser.UpdatedTime,
+		UpdateHistory: createdUser.UpdateHistory}
+	return &createdUserResp, nil
 }
 
-func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserModel, error) {
-	var user models.UserModel
+func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserRespModel, error) {
+	var user models.UserRespModel
 	err := r.collection.FindOne(ctx, bson.M{"userid": userId}).Decode(&user)
 	return &user, err
 }
 
-func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid string) (*models.UserModel, error) {
-	var user models.UserModel
+func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid string) (*models.UserRespModel, error) {
+	var user models.UserRespModel
 	err := r.collection.FindOne(ctx, bson.M{"uid": uid}).Decode(&user)
 	return &user, err
 }
@@ -109,16 +123,16 @@ func (r *UserRepositoryImpl) DeleteByUserId(ctx context.Context, userId string) 
 	return err
 }
 
-func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserModel, error) {
+func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserRespModel, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var users []*models.UserModel
+	var users []*models.UserRespModel
 	for cursor.Next(ctx) {
-		var user models.UserModel
+		var user models.UserRespModel
 		if err := cursor.Decode(&user); err != nil {
 			return nil, err
 		}
@@ -127,12 +141,12 @@ func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserMod
 	return users, nil
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel, authUserName string) error {
+func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel, authUserName string) (*models.UserRespModel, error) {
 	// Update the UpdatedTime field
 	var eUser models.UserModel
 	err := r.collection.FindOne(ctx, bson.M{"uid": user.UId}).Decode(&eUser)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Generate a diff between the existing user and the incoming user
@@ -172,7 +186,21 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel,
 		bson.M{"uid": user.UId}, // Filter by uId
 		bson.M{"$set": user},    // Update the user document
 	)
-	return err
+	// Convert to UserRespModel
+	createdUserResp := models.UserRespModel{
+		UId:           user.UId,
+		UserId:        user.UserId,
+		Username:      user.Username,
+		Role:          user.Role,
+		Status:        user.Status,
+		MobileNumber:  user.MobileNumber,
+		Remarks:       user.Remarks,
+		OrgUUID:       user.OrgUUID,
+		CreatedTime:   user.CreatedTime,
+		OrgStatus:     user.OrgStatus,
+		UpdatedTime:   user.UpdatedTime,
+		UpdateHistory: user.UpdateHistory}
+	return &createdUserResp, nil
 }
 func (r *UserRepositoryImpl) UpdateUsersStatusByOrgUUID(ctx context.Context, orgUUID string, status models.UserStatus) error {
 	_, err := r.collection.UpdateMany(
@@ -180,5 +208,13 @@ func (r *UserRepositoryImpl) UpdateUsersStatusByOrgUUID(ctx context.Context, org
 		bson.M{"org_uuid": orgUUID},              // Filter by org_uuid
 		bson.M{"$set": bson.M{"status": status}}, // Update the status field
 	)
+	return err
+}
+
+func (r *UserRepositoryImpl) UpdateUserStatus(ctx context.Context, userId string, status string) error {
+	filter := bson.M{"userid": userId}
+	update := bson.M{"$set": bson.M{"status": status, "updated_time": time.Now().UTC().Format(time.RFC3339)}}
+
+	_, err := r.collection.UpdateOne(ctx, filter, update)
 	return err
 }

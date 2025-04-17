@@ -14,7 +14,7 @@ func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo reposi
 		// Extract the token from the Authorization header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token required"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token required with format Bearer <token>"})
 			c.Abort()
 			return
 		}
@@ -30,7 +30,7 @@ func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo reposi
 		}
 
 		// Extract org_id from the request (assuming it's passed as a query parameter or path parameter)
-		org_id := c.Param("org_id")
+		org_id := c.GetHeader("org_id")
 		if org_id == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
 			c.Abort()

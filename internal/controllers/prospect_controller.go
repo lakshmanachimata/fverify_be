@@ -32,7 +32,7 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Success 201 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /prospects [post]
+// @Router /api/v1/prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(models.UserModel)
@@ -103,7 +103,7 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /prospects/{id} [get]
+// @Router /api/v1/prospects/{id} [get]
 func (pc *ProspectController) GetProspect(c *gin.Context) {
 	uid := c.Param("uid")
 	prospect, err := pc.Service.GetProspectByID(c.Request.Context(), uid)
@@ -129,7 +129,7 @@ func (pc *ProspectController) GetProspect(c *gin.Context) {
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /prospects/{uid} [put]
+// @Router /api/v1/prospects/{uid} [put]
 func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(models.UserModel)

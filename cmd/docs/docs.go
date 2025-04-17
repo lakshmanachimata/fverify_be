@@ -15,66 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/create": {
-            "post": {
-                "description": "Create a new admin user in the system (requires API key)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Create a new admin user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "API key",
-                        "name": "X-API-Key",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Admin user data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.UserModel"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InternalErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/organisations": {
+        "/api/v1/organisations": {
             "get": {
                 "description": "Retrieve all organisations in the system",
                 "consumes": [
@@ -184,7 +125,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organisations/{org_id}": {
+        "/api/v1/organisations/{org_id}": {
             "put": {
                 "description": "Update an existing organisation's details",
                 "consumes": [
@@ -256,66 +197,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/owner/create": {
-            "post": {
-                "description": "Create a new admin user in the system (requires API key)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Create a new owner",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "API key",
-                        "name": "X-API-Key",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "User data (all fields are mandatory)",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.UserModel"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InternalErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/prospects": {
+        "/api/v1/prospects": {
             "post": {
                 "description": "Create a new prospect in the system",
                 "consumes": [
@@ -375,7 +257,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/prospects/{id}": {
+        "/api/v1/prospects/{id}": {
             "get": {
                 "description": "Retrieve a prospect by their unique ID",
                 "consumes": [
@@ -439,7 +321,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/prospects/{uid}": {
+        "/api/v1/prospects/{uid}": {
             "put": {
                 "description": "Update an existing prospect in the system. Update comments are generated based on differences from the earlier prospect state.",
                 "consumes": [
@@ -512,7 +394,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/api/v1/users": {
             "get": {
                 "description": "Retrieve all users in the system",
                 "consumes": [
@@ -547,7 +429,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.UserModel"
+                                "$ref": "#/definitions/models.UserRespModel"
                             }
                         }
                     },
@@ -606,7 +488,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -630,7 +512,66 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/login": {
+        "/api/v1/users/admin/create": {
+            "post": {
+                "description": "Create a new admin user in the system (requires API key)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new admin user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Admin user data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserReqModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRespModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/login": {
             "post": {
                 "description": "Validate username and password, and return user details with a token",
                 "consumes": [
@@ -682,7 +623,66 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/roles": {
+        "/api/v1/users/owner/create": {
+            "post": {
+                "description": "Create a new admin user in the system (requires API key)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new owner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User data (all fields are mandatory)",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserReqModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRespModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/roles": {
             "get": {
                 "description": "Retrieve all user roles for a given organisation",
                 "consumes": [
@@ -738,7 +738,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/uid/{uId}": {
+        "/api/v1/users/uid/{uId}": {
             "put": {
                 "description": "Update an existing user's details",
                 "consumes": [
@@ -787,7 +787,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -817,7 +817,153 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{userId}": {
+        "/api/v1/users/uid/{uId}/setpassword": {
+            "put": {
+                "description": "Set a new password for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Set a user's password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User uId",
+                        "name": "uId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SetPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/userid/{userId}": {
+            "delete": {
+                "description": "Delete a user by their unique userId",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user by userId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User userId",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{userId}": {
             "get": {
                 "description": "Retrieve a user by their unique ID",
                 "consumes": [
@@ -857,7 +1003,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -961,6 +1107,16 @@ const docTemplate = `{
                     "description": "Error message",
                     "type": "string",
                     "example": "No data"
+                }
+            }
+        },
+        "controllers.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "Success message",
+                    "type": "string",
+                    "example": "User created successfully"
                 }
             }
         },
@@ -1480,6 +1636,19 @@ const docTemplate = `{
                 "OperationsExecutive"
             ]
         },
+        "models.SetPasswordRequest": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "description": "New password",
+                    "type": "string",
+                    "example": "new_password"
+                }
+            }
+        },
         "models.UpdateHistory": {
             "description": "History of updates made to a user.",
             "type": "object",
@@ -1501,7 +1670,70 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UserModel": {
+        "models.UserReqModel": {
+            "type": "object",
+            "required": [
+                "mobile_number",
+                "org_id",
+                "password",
+                "remarks",
+                "role",
+                "status",
+                "userid",
+                "username"
+            ],
+            "properties": {
+                "mobile_number": {
+                    "description": "Mobile number of the user",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "org_id": {
+                    "description": "UUID of the organization",
+                    "type": "string",
+                    "example": "123456"
+                },
+                "password": {
+                    "description": "Hashed password",
+                    "type": "string",
+                    "example": "plane_password"
+                },
+                "remarks": {
+                    "description": "Additional remarks about the user",
+                    "type": "string",
+                    "example": "User is active and verified"
+                },
+                "role": {
+                    "description": "Role of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Role"
+                        }
+                    ],
+                    "example": "Admin"
+                },
+                "status": {
+                    "description": "Status of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UserStatus"
+                        }
+                    ],
+                    "example": "Active"
+                },
+                "userid": {
+                    "description": "Unique identifier for the user",
+                    "type": "string",
+                    "example": "112345"
+                },
+                "username": {
+                    "description": "Username of the user",
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        },
+        "models.UserRespModel": {
             "description": "User model containing all user-related information.",
             "type": "object",
             "properties": {
@@ -1528,11 +1760,6 @@ const docTemplate = `{
                     "description": "UUID of the organization",
                     "type": "string",
                     "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
-                "password": {
-                    "description": "Hashed password",
-                    "type": "string",
-                    "example": "plane_password"
                 },
                 "remarks": {
                     "description": "Additional remarks about the user",
@@ -1573,79 +1800,6 @@ const docTemplate = `{
                     "description": "Time when the user was last updated",
                     "type": "string",
                     "example": "2023-04-12T15:04:05Z"
-                },
-                "userid": {
-                    "description": "Unique identifier for the user",
-                    "type": "string",
-                    "example": "112345"
-                },
-                "username": {
-                    "description": "Username of the user",
-                    "type": "string",
-                    "example": "john_doe"
-                }
-            }
-        },
-        "models.UserReqModel": {
-            "type": "object",
-            "required": [
-                "mobile_number",
-                "org_id",
-                "org_status",
-                "password",
-                "remarks",
-                "role",
-                "status",
-                "userid",
-                "username"
-            ],
-            "properties": {
-                "mobile_number": {
-                    "description": "Mobile number of the user",
-                    "type": "string",
-                    "example": "9876543210"
-                },
-                "org_id": {
-                    "description": "UUID of the organization",
-                    "type": "string",
-                    "example": "123456"
-                },
-                "org_status": {
-                    "description": "Organization ID",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.OrganisationStatus"
-                        }
-                    ],
-                    "example": "123456"
-                },
-                "password": {
-                    "description": "Hashed password",
-                    "type": "string",
-                    "example": "plane_password"
-                },
-                "remarks": {
-                    "description": "Additional remarks about the user",
-                    "type": "string",
-                    "example": "User is active and verified"
-                },
-                "role": {
-                    "description": "Role of the user",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Role"
-                        }
-                    ],
-                    "example": "Admin"
-                },
-                "status": {
-                    "description": "Status of the user",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.UserStatus"
-                        }
-                    ],
-                    "example": "Active"
                 },
                 "userid": {
                     "description": "Unique identifier for the user",

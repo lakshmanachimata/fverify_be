@@ -30,7 +30,7 @@ func NewOrganisationController(service *services.OrganisationService) *Organisat
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAPIKeyResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /organisations [post]
+// @Router /api/v1/organisations [post]
 func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
 	var reqOrg models.OrganisationReq
 	if err := c.ShouldBindJSON(&reqOrg); err != nil {
@@ -67,7 +67,7 @@ func (oc *OrganisationController) CreateOrganisation(c *gin.Context) {
 // @Failure 401 {object} InvalidAPIKeyResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /organisations/{org_id} [put]
+// @Router /api/v1/organisations/{org_id} [put]
 func (oc *OrganisationController) UpdateOrganisation(c *gin.Context) {
 	org_id := c.Param("org_id")
 
@@ -118,7 +118,7 @@ func (oc *OrganisationController) UpdateOrganisation(c *gin.Context) {
 // // @Failure 401 {object} InvalidAPIKeyResponse
 // // @Failure 404 {object} NotFoundResponse
 // // @Failure 500 {object} InternalErrorResponse
-// // @Router /organisations/{org_id} [delete]
+// // @Router /api/v1/organisations/{org_id} [delete]
 func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
 	org_id := c.Param("org_id")
 
@@ -142,7 +142,7 @@ func (oc *OrganisationController) DeleteOrganisation(c *gin.Context) {
 // @Failure 401 {object} InvalidAPIKeyResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /organisations [get]
+// @Router /api/v1/organisations [get]
 func (oc *OrganisationController) GetAllOrganisations(c *gin.Context) {
 	organisations, err := oc.Service.GetAllOrganisations(c.Request.Context())
 	if err != nil {

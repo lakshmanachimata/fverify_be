@@ -63,11 +63,11 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 201 {object} models.UserModel
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users [post]
+// @Router /api/v1/users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
@@ -134,7 +134,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	user.Status = reqUser.Status
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
-	user.OrgStatus = reqUser.OrgStatus
+	user.OrgStatus = existingOrg.Status
 	user.OrgUUID = authUser.OrgUUID
 	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
 	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
@@ -165,12 +165,12 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
 // @Param userId path int true "User ID"
-// @Success 200 {object} models.UserModel
+// @Success 200 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/{userId} [get]
+// @Router /api/v1/users/{userId} [get]
 func (uc *UserController) GetUserByUserID(c *gin.Context) {
 	idParam := c.Param("userId")
 	user, err := uc.Service.GetByUserID(c.Request.Context(), idParam)
@@ -190,10 +190,10 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Success 200 {array} models.UserModel
+// @Success 200 {array} models.UserRespModel
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /users [get]
+// @Router /api/v1/users [get]
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	users, err := uc.Service.GetAllUsers(c.Request.Context())
 	if err != nil {
@@ -219,7 +219,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /users/uid/{uId} [delete]
+// @Router /api/v1/users/uid/{uId} [delete]
 // func (uc *UserController) DeleteUserByUId(c *gin.Context) {
 // 	uIdParam := c.Param("uId")
 
@@ -247,21 +247,21 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/userid/{userId} [delete]
-// func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
-// 	userId := c.Param("userId")
+// @Router /api/v1/users/userid/{userId} [delete]
+func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
+	userId := c.Param("userId")
 
-// 	err := uc.Service.DeleteByUserId(c.Request.Context(), userId)
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, ErrorResponse{
-// 			Error:   "User not found",
-// 			Details: "No user found with the given userId",
-// 		})
-// 		return
-// 	}
+	err := uc.Service.DeleteByUserId(c.Request.Context(), userId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Error:   "User not found",
+			Details: "No user found with the given userId",
+		})
+		return
+	}
 
-// 	c.Status(http.StatusNoContent)
-// }
+	c.Status(http.StatusNoContent)
+}
 
 // UpdateUser godoc
 // @Summary Update a user
@@ -273,12 +273,12 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Param org_id  header string true "Organisation Id"
 // @Param uId path string true "User uId"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 200 {object} models.UserModel
+// @Success 200 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/uid/{uId} [put]
+// @Router /api/v1/users/uid/{uId} [put]
 func (uc *UserController) UpdateUser(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
@@ -341,16 +341,15 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	user.Status = reqUser.Status
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
-	user.OrgStatus = reqUser.OrgStatus
 	user.OrgUUID = authUser.OrgUUID
 
-	err = uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
+	uUser, err := uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, uUser)
 }
 
 // LoginUser godoc
@@ -364,7 +363,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/login [post]
+// @Router /api/v1/users/login [post]
 func (uc *UserController) LoginUser(c *gin.Context) {
 	var loginRequest models.LoginRequest
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
@@ -388,6 +387,16 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
+	}
+
+	// Update user status to Active
+	if user.Status != models.Active {
+		err = uc.Service.UpdateUserStatus(c.Request.Context(), user.UserId, string(models.Active))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user status"})
+			return
+		}
+		user.Status = models.Active // Update the status in the user object
 	}
 
 	// Generate the token
@@ -425,52 +434,52 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/uid/{uId}/setpassword [put]
-// func (uc *UserController) SetPassword(c *gin.Context) {
-// 	claims, _ := c.Get("user")
-// 	authUser := claims.(*auth.AuthTokenClaims)
+// @Router /api/v1/users/uid/{uId}/setpassword [put]
+func (uc *UserController) SetPassword(c *gin.Context) {
+	claims, _ := c.Get("user")
+	authUser := claims.(*auth.AuthTokenClaims)
 
-// 	uIdParam := c.Param("uId")
+	uIdParam := c.Param("uId")
 
-// 	var request models.SetPasswordRequest
-// 	if err := c.ShouldBindJSON(&request); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-// 		return
-// 	}
+	var request models.SetPasswordRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
 
-// 	// Fetch the target user to validate roles
-// 	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-// 		return
-// 	}
+	// Fetch the target user to validate roles
+	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
 
-// 	// Role-based access control
-// 	if authUser.Role == string(models.Admin) || authUser.Role == string(models.Owner) {
-// 		if targetUser.Role != models.Admin && targetUser.Role != models.OperationsLead {
-// 			c.JSON(http.StatusForbidden, gin.H{"error": "Admins and Owners can only set passwords for Admins and Operations Leads"})
-// 			return
-// 		}
-// 	} else if authUser.Role == string(models.OperationsLead) {
-// 		if targetUser.Role != models.OperationsLead && targetUser.Role != models.FieldLead &&
-// 			targetUser.Role != models.FieldExecutive && targetUser.Role != models.OperationsExecutive {
-// 			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only set passwords for specific roles"})
-// 			return
-// 		}
-// 	} else {
-// 		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
-// 		return
-// 	}
+	// Role-based access control
+	if authUser.Role == string(models.Admin) || authUser.Role == string(models.Owner) {
+		if targetUser.Role != models.Admin && targetUser.Role != models.OperationsLead {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins and Owners can only set passwords for Admins and Operations Leads"})
+			return
+		}
+	} else if authUser.Role == string(models.OperationsLead) {
+		if targetUser.Role != models.OperationsLead && targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive && targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only set passwords for specific roles"})
+			return
+		}
+	} else {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
 
-// 	// Update the password
-// 	err = uc.Service.SetPassword(c.Request.Context(), uId, request.Password)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
-// 		return
-// 	}
+	// Update the password
+	err = uc.Service.SetPassword(c.Request.Context(), uIdParam, request.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
-// }
+	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+}
 
 // CreateAdminUser godoc
 // @Summary Create a new admin user
@@ -480,11 +489,11 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Produce json
 // @Param X-API-Key header string true "API key"
 // @Param user body models.UserReqModel true "Admin user data"
-// @Success 201 {object} models.UserModel
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /admin/create [post]
+// @Router /api/v1/users/admin/create [post]
 func (uc *UserController) CreateAdmin(c *gin.Context) {
 	var reqUser models.UserReqModel
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
@@ -517,7 +526,7 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 	user.Status = reqUser.Status
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
-	user.OrgStatus = reqUser.OrgStatus
+	user.OrgStatus = existingOrg.Status
 	user.OrgUUID = existingOrg.OrgUUID
 	user.UId = uuid.New().String()
 
@@ -549,11 +558,11 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 // @Produce json
 // @Param X-API-Key header string true "API key"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 201 {object} models.UserModel
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /owner/create [post]
+// @Router /api/v1/users/owner/create [post]
 func (uc *UserController) CreateOwner(c *gin.Context) {
 	var reqUser models.UserReqModel
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
@@ -586,7 +595,7 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 	user.Status = reqUser.Status
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
-	user.OrgStatus = reqUser.OrgStatus
+	user.OrgStatus = existingOrg.Status
 	user.OrgUUID = existingOrg.OrgUUID
 	user.UId = uuid.New().String()
 	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
@@ -622,7 +631,7 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/roles [get]
+// @Router /api/v1/users/roles [get]
 func (uc *UserController) GetUserRoles(c *gin.Context) {
 	org_id := c.Query("org_id")
 	if org_id == "" {

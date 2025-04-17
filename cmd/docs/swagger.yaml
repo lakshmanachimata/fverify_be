@@ -55,6 +55,13 @@ definitions:
         example: No data
         type: string
     type: object
+  controllers.SuccessResponse:
+    properties:
+      message:
+        description: Success message
+        example: User created successfully
+        type: string
+    type: object
   models.EmploymentType:
     enum:
     - Employee
@@ -452,6 +459,15 @@ definitions:
     - FieldExecutive
     - Owner
     - OperationsExecutive
+  models.SetPasswordRequest:
+    properties:
+      password:
+        description: New password
+        example: new_password
+        type: string
+    required:
+    - password
+    type: object
   models.UpdateHistory:
     description: History of updates made to a user.
     properties:
@@ -468,7 +484,53 @@ definitions:
         example: "2023-04-12T15:04:05Z"
         type: string
     type: object
-  models.UserModel:
+  models.UserReqModel:
+    properties:
+      mobile_number:
+        description: Mobile number of the user
+        example: "9876543210"
+        type: string
+      org_id:
+        description: UUID of the organization
+        example: "123456"
+        type: string
+      password:
+        description: Hashed password
+        example: plane_password
+        type: string
+      remarks:
+        description: Additional remarks about the user
+        example: User is active and verified
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/models.Role'
+        description: Role of the user
+        example: Admin
+      status:
+        allOf:
+        - $ref: '#/definitions/models.UserStatus'
+        description: Status of the user
+        example: Active
+      userid:
+        description: Unique identifier for the user
+        example: "112345"
+        type: string
+      username:
+        description: Username of the user
+        example: john_doe
+        type: string
+    required:
+    - mobile_number
+    - org_id
+    - password
+    - remarks
+    - role
+    - status
+    - userid
+    - username
+    type: object
+  models.UserRespModel:
     description: User model containing all user-related information.
     properties:
       created_time:
@@ -487,10 +549,6 @@ definitions:
       org_uuid:
         description: UUID of the organization
         example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      password:
-        description: Hashed password
-        example: plane_password
         type: string
       remarks:
         description: Additional remarks about the user
@@ -528,58 +586,6 @@ definitions:
         example: john_doe
         type: string
     type: object
-  models.UserReqModel:
-    properties:
-      mobile_number:
-        description: Mobile number of the user
-        example: "9876543210"
-        type: string
-      org_id:
-        description: UUID of the organization
-        example: "123456"
-        type: string
-      org_status:
-        allOf:
-        - $ref: '#/definitions/models.OrganisationStatus'
-        description: Organization ID
-        example: "123456"
-      password:
-        description: Hashed password
-        example: plane_password
-        type: string
-      remarks:
-        description: Additional remarks about the user
-        example: User is active and verified
-        type: string
-      role:
-        allOf:
-        - $ref: '#/definitions/models.Role'
-        description: Role of the user
-        example: Admin
-      status:
-        allOf:
-        - $ref: '#/definitions/models.UserStatus'
-        description: Status of the user
-        example: Active
-      userid:
-        description: Unique identifier for the user
-        example: "112345"
-        type: string
-      username:
-        description: Username of the user
-        example: john_doe
-        type: string
-    required:
-    - mobile_number
-    - org_id
-    - org_status
-    - password
-    - remarks
-    - role
-    - status
-    - userid
-    - username
-    type: object
   models.UserStatus:
     enum:
     - Created
@@ -605,46 +611,7 @@ info:
   title: FVerify API
   version: "1.0"
 paths:
-  /admin/create:
-    post:
-      consumes:
-      - application/json
-      description: Create a new admin user in the system (requires API key)
-      parameters:
-      - description: API key
-        in: header
-        name: X-API-Key
-        required: true
-        type: string
-      - description: Admin user data
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserReqModel'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.UserModel'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.InternalErrorResponse'
-      summary: Create a new admin user
-      tags:
-      - Users
-  /organisations:
+  /api/v1/organisations:
     get:
       consumes:
       - application/json
@@ -717,7 +684,7 @@ paths:
       summary: Create a new organisation
       tags:
       - Organisations
-  /organisations/{org_id}:
+  /api/v1/organisations/{org_id}:
     put:
       consumes:
       - application/json
@@ -765,46 +732,7 @@ paths:
       summary: Update an organisation
       tags:
       - Organisations
-  /owner/create:
-    post:
-      consumes:
-      - application/json
-      description: Create a new admin user in the system (requires API key)
-      parameters:
-      - description: API key
-        in: header
-        name: X-API-Key
-        required: true
-        type: string
-      - description: User data (all fields are mandatory)
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserReqModel'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.UserModel'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.InternalErrorResponse'
-      summary: Create a new owner
-      tags:
-      - Users
-  /prospects:
+  /api/v1/prospects:
     post:
       consumes:
       - application/json
@@ -844,7 +772,7 @@ paths:
       summary: Create a new prospect
       tags:
       - Prospects
-  /prospects/{id}:
+  /api/v1/prospects/{id}:
     get:
       consumes:
       - application/json
@@ -887,7 +815,7 @@ paths:
       summary: Get a prospect by ID
       tags:
       - Prospects
-  /prospects/{uid}:
+  /api/v1/prospects/{uid}:
     put:
       consumes:
       - application/json
@@ -937,7 +865,7 @@ paths:
       summary: Update an existing prospect
       tags:
       - Prospects
-  /users:
+  /api/v1/users:
     get:
       consumes:
       - application/json
@@ -960,7 +888,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.UserModel'
+              $ref: '#/definitions/models.UserRespModel'
             type: array
         "401":
           description: Unauthorized
@@ -1000,7 +928,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.UserModel'
+            $ref: '#/definitions/models.UserRespModel'
         "400":
           description: Bad Request
           schema:
@@ -1016,7 +944,7 @@ paths:
       summary: Create a new user
       tags:
       - Users
-  /users/{userId}:
+  /api/v1/users/{userId}:
     get:
       consumes:
       - application/json
@@ -1043,7 +971,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserModel'
+            $ref: '#/definitions/models.UserRespModel'
         "400":
           description: Bad Request
           schema:
@@ -1063,7 +991,46 @@ paths:
       summary: Get a user by userId
       tags:
       - Users
-  /users/login:
+  /api/v1/users/admin/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin user in the system (requires API key)
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Admin user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserReqModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserRespModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Create a new admin user
+      tags:
+      - Users
+  /api/v1/users/login:
     post:
       consumes:
       - application/json
@@ -1098,7 +1065,46 @@ paths:
       summary: Login a user
       tags:
       - Users
-  /users/roles:
+  /api/v1/users/owner/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin user in the system (requires API key)
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: User data (all fields are mandatory)
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserReqModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserRespModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Create a new owner
+      tags:
+      - Users
+  /api/v1/users/roles:
     get:
       consumes:
       - application/json
@@ -1135,7 +1141,7 @@ paths:
       summary: Get user roles
       tags:
       - Users
-  /users/uid/{uId}:
+  /api/v1/users/uid/{uId}:
     put:
       consumes:
       - application/json
@@ -1168,7 +1174,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserModel'
+            $ref: '#/definitions/models.UserRespModel'
         "400":
           description: Bad Request
           schema:
@@ -1186,6 +1192,104 @@ paths:
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Update a user
+      tags:
+      - Users
+  /api/v1/users/uid/{uId}/setpassword:
+    put:
+      consumes:
+      - application/json
+      description: Set a new password for a user
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Organisation Id
+        in: header
+        name: org_id
+        required: true
+        type: string
+      - description: User uId
+        in: path
+        name: uId
+        required: true
+        type: integer
+      - description: New password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAuthResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Set a user's password
+      tags:
+      - Users
+  /api/v1/users/userid/{userId}:
+    delete:
+      description: Delete a user by their unique userId
+      parameters:
+      - description: User userId
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Organisation Id
+        in: header
+        name: org_id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.InvalidAuthResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Delete a user by userId
       tags:
       - Users
 schemes:
