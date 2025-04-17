@@ -66,7 +66,7 @@ definitions:
   models.LoginRequest:
     description: Login request payload containing username and password.
     properties:
-      orgId:
+      org_id:
         description: Organization ID
         example: "123456"
         type: string
@@ -79,7 +79,7 @@ definitions:
         example: john_doe
         type: string
     required:
-    - orgId
+    - org_id
     - password
     - username
     type: object
@@ -130,6 +130,24 @@ definitions:
       org_uuid:
         description: Auto-generated UUID
         example: uuid-v4
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/models.OrganisationStatus'
+        description: Organisation Status
+        example: Active
+    type: object
+  models.OrganisationReq:
+    description: OrganisationReq model containing all organisation request related
+      information.
+    properties:
+      org_id:
+        description: Organisation ID
+        example: "12345"
+        type: string
+      org_name:
+        description: Organisation Name
+        example: Acme Corp
         type: string
       status:
         allOf:
@@ -692,7 +710,7 @@ paths:
         name: organisation
         required: true
         schema:
-          $ref: '#/definitions/models.Organisation'
+          $ref: '#/definitions/models.OrganisationReq'
       produces:
       - application/json
       responses:
@@ -715,7 +733,7 @@ paths:
       summary: Create a new organisation
       tags:
       - Organisations
-  /organisations/{orgId}:
+  /organisations/{org_id}:
     put:
       consumes:
       - application/json
@@ -728,7 +746,7 @@ paths:
         type: string
       - description: Organisation ID
         in: path
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: Updated organisation data
@@ -736,7 +754,7 @@ paths:
         name: organisation
         required: true
         schema:
-          $ref: '#/definitions/models.Organisation'
+          $ref: '#/definitions/models.OrganisationReq'
       produces:
       - application/json
       responses:
@@ -815,7 +833,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: Prospect data
@@ -860,7 +878,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       produces:
@@ -904,7 +922,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: Updated prospect data
@@ -948,7 +966,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       produces:
@@ -983,7 +1001,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: User data (all fields are mandatory)
@@ -1027,7 +1045,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: User ID
@@ -1146,7 +1164,7 @@ paths:
         type: string
       - description: Organisation Id
         in: header
-        name: orgId
+        name: org_id
         required: true
         type: string
       - description: User uId

@@ -61,7 +61,7 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 201 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -163,7 +163,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param userId path int true "User ID"
 // @Success 200 {object} models.UserModel
 // @Failure 400 {object} ErrorResponse
@@ -189,7 +189,7 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Success 200 {array} models.UserModel
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
@@ -213,7 +213,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Tags Users
 // @Param uId path int true "User uId"
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
@@ -241,7 +241,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Tags Users
 // @Param userId path string true "User userId"
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
@@ -270,7 +270,7 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param uId path string true "User uId"
 // @Param user body models.UserReqModel true "User data (all fields are mandatory)"
 // @Success 200 {object} models.UserModel
@@ -419,7 +419,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param uId path int true "User uId"
 // @Param password body models.SetPasswordRequest true "New password"
 // @Success 200 {object} SuccessResponse
@@ -625,14 +625,14 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 // @Failure 500 {object} InternalErrorResponse
 // @Router /users/roles [get]
 func (uc *UserController) GetUserRoles(c *gin.Context) {
-	orgId := c.Query("orgId")
-	if orgId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "orgId is required"})
+	org_id := c.Query("org_id")
+	if org_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), orgId)
+	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return

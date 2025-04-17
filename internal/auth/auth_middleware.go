@@ -29,16 +29,16 @@ func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo reposi
 			return
 		}
 
-		// Extract orgId from the request (assuming it's passed as a query parameter or path parameter)
-		orgId := c.Param("orgId")
-		if orgId == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "orgId is required"})
+		// Extract org_id from the request (assuming it's passed as a query parameter or path parameter)
+		org_id := c.Param("org_id")
+		if org_id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
 			c.Abort()
 			return
 		}
 
-		// Step 1: Get org from orgId
-		org, err := orgRepo.GetOrganisationByID(c.Request.Context(), orgId)
+		// Step 1: Get org from org_id
+		org, err := orgRepo.GetOrganisationByID(c.Request.Context(), org_id)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found"})
 			c.Abort()

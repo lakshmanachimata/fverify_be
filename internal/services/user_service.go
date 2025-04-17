@@ -46,8 +46,8 @@ func (s *UserService) DeleteByUserId(ctx context.Context, userId string) error {
 func (s *UserService) UpdateUser(ctx context.Context, user *models.UserModel, authUserName string) error {
 	return s.repo.Update(ctx, user, authUserName)
 }
-func (s *UserService) LoginUser(ctx context.Context, username, password string, orgId string) (*models.UserModel, error) {
-	return s.repo.ValidateUser(ctx, username, password, orgId)
+func (s *UserService) LoginUser(ctx context.Context, username, password string, org_id string) (*models.UserModel, error) {
+	return s.repo.ValidateUser(ctx, username, password, org_id)
 }
 func (s *UserService) SetPassword(ctx context.Context, uId string, newPassword string) error {
 	return s.repo.SetPassword(ctx, uId, newPassword)

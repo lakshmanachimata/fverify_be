@@ -115,26 +115,25 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param X-API-Key header string true "API key"
-	// @Param orgId path string true "Organisation ID"
 	// @Param organisation body models.Organisation true "Updated organisation data"
 	// @Success 200 {object} models.Organisation
 	// @Failure 400 {object} gin.H{"error": "Invalid input"}
 	// @Failure 401 {object} gin.H{"error": "Invalid API key"}
 	// @Failure 404 {object} gin.H{"error": "Organisation not found"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
-	// @Router /organisations/{orgId} [put]
-	router.PUT("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.UpdateOrganisation)
+	// @Router /organisations/{org_id} [put]
+	router.PUT("/organisations/:org_id", auth.OrgAPIKeyMiddleware(), organisationController.UpdateOrganisation)
 	// // @Summary Delete an organisation
 	// // @Description Delete an organisation by its ID
 	// // @Tags Organisations
 	// // @Param X-API-Key header string true "API key"
-	// // @Param orgId path string true "Organisation ID"
+	// // @Param org_id path string true "Organisation ID"
 	// // @Success 204 "No Content"
 	// // @Failure 401 {object} gin.H{"error": "Invalid API key"}
 	// // @Failure 404 {object} gin.H{"error": "Organisation not found"}
 	// // @Failure 500 {object} gin.H{"error": "Internal Server Error"}
-	// // @Router /organisations/{orgId} [delete]
-	// router.DELETE("/organisations/:orgId", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
+	// // @Router /organisations/{org_id} [delete]
+	// router.DELETE("/organisations/:org_id", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
 
 	// @Summary Get all organisations
 	// @Description Retrieve all organisations in the system
@@ -164,7 +163,7 @@ func main() {
 	// @Description Create a new user in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param user body models.UserReqModel true "User data"
@@ -178,7 +177,7 @@ func main() {
 	// @Description Update an existing user's details
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param uId path int true "User uId"
@@ -194,7 +193,7 @@ func main() {
 	// @Description Retrieve all users in the system
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Success 200 {array} models.UserModel
@@ -206,7 +205,7 @@ func main() {
 	// @Description Retrieve a user by their unique ID
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Accept json
 	// @Produce json
 	// @Param userId path string true "User ID"
@@ -220,7 +219,7 @@ func main() {
 	// @Description Delete a user by their unique uId
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param uId path int true "User uId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid uId"}
@@ -232,7 +231,7 @@ func main() {
 	// @Description Delete a user by their unique userId
 	// @Tags Users
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param userId path string true "User userId"
 	// @Success 204 "No Content"
 	// @Failure 400 {object} gin.H{"error": "Invalid userId"}
@@ -246,7 +245,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param uId path int true "User uId"
 	// @Param password body models.SetPasswordRequest true "New password"
 	// @Success 200 {object} gin.H{"message": "Password updated successfully"}
@@ -290,9 +289,9 @@ func main() {
 	// @Tags Users
 	// @Accept json
 	// @Produce json
-	// @Param orgId query string true "Organisation ID"
+	// @Param org_id query string true "Organisation ID"
 	// @Success 200 {array} string
-	// @Failure 400 {object} gin.H{"error": "Invalid orgId"}
+	// @Failure 400 {object} gin.H{"error": "Invalid org_id"}
 	// @Failure 404 {object} gin.H{"error": "Organisation not found or inactive"}
 	// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
 	// @Router /users/roles [get]
@@ -305,7 +304,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param prospect body models.ProspecReqtModel true "Prospect data"
 	// @Success 201 {object} gin.H{"message": "Prospect created"}
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}
@@ -319,7 +318,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param uid path string true "Prospect ID"
 	// @Success 200 {object} models.ProspectModel
 	// @Failure 400 {object} gin.H{"error": "Invalid prospect ID"}
@@ -334,7 +333,7 @@ func main() {
 	// @Accept json
 	// @Produce json
 	// @Param Authorization header string true "Bearer token"
-	// @Param orgId  header string true "Organisation Id"
+	// @Param org_id  header string true "Organisation Id"
 	// @Param prospect body models.ProspecReqtModel true "Prospect data"
 	// @Success 201 {object} gin.H{"message": "Prospect created"}
 	// @Failure 400 {object} gin.H{"error": "Bad Request"}

@@ -41,6 +41,7 @@ type UpdateHistory struct {
 // @Description User model containing all user-related information.
 //
 //		@Example {
+//		  "uid": "123e4567-e89b-12d3-a456-426614174111",
 //		  "userid": "12345",
 //		  "username": "john_doe",
 //		  "password": "plane_password",
@@ -56,7 +57,7 @@ type UpdateHistory struct {
 //		    }
 //		  ],
 //		  "remarks": "User is active and verified",
-//		  "orgId": "123456"
+//		  "OrgUUID": "123e4567-e89b-12d3-a456-426614174000"
 //		}
 type UserModel struct {
 	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
@@ -73,6 +74,28 @@ type UserModel struct {
 	OrgStatus     OrganisationStatus `bson:"org_status" json:"org_status" example:"123456"`                           // Organization ID
 	OrgUUID       string             `bson:"org_uuid" json:"org_uuid" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
 }
+
+// UserModel represents a user in the system.
+// @Description User model containing all user-related information.
+//
+//		@Example {
+//		  "userid": "12345",
+//		  "username": "john_doe",
+//		  "password": "plane_password",
+//		  "role": "Admin",
+//		  "status": "Active",
+//		  "created_time": "2023-04-12T15:04:05Z",
+//		  "updated_time": "2023-04-12T15:04:05Z",
+//	   	  "mobile_number": "9876543210",
+//		  "update_history": [
+//		    {
+//		      "updated_comments": "Updated user role",
+//		      "updated_time": "2023-04-12T15:04:05Z"
+//		    }
+//		  ],
+//		  "remarks": "User is active and verified",
+//		  "OrgUUID": "123e4567-e89b-12d3-a456-426614174000"
+//		}
 
 type UserReqModel struct {
 	UserId        string             `bson:"userid" json:"userid" binding:"required" example:"112345"`                                    // Unique identifier for the user
@@ -99,7 +122,7 @@ type UserReqModel struct {
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"   example:"john_doe"`  // Username
 	Password string `json:"password" binding:"required"    example:"password"` // Password
-	OrgId    string `json:"orgId" binding:"required"   example:"123456"`       // Organization ID
+	OrgId    string `json:"org_id" binding:"required"   example:"123456"`      // Organization ID
 }
 
 // LoginResponse represents the response payload for the login API.

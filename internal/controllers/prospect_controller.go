@@ -27,7 +27,7 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param prospect body models.ProspecReqtModel true "Prospect data"
 // @Success 201 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
@@ -98,7 +98,7 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Produce json
 // @Param uid path string true "Prospect UID"
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Success 200 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
@@ -123,7 +123,7 @@ func (pc *ProspectController) GetProspect(c *gin.Context) {
 // @Produce json
 // @Param uid path string true "Prospect UId"
 // @Param Authorization header string true "Bearer token"
-// @Param orgId  header string true "Organisation Id"
+// @Param org_id  header string true "Organisation Id"
 // @Param prospect body models.ProspecReqtModel true "Updated prospect data"
 // @Success 200 {object} models.ProspectModel
 // @Failure 400 {object} ErrorResponse

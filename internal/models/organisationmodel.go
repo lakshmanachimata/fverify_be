@@ -10,6 +10,20 @@ const (
 	OrgInActive OrganisationStatus = "InActive"
 )
 
+// OrganisationReq represents an Organisation Request in the system.
+// @Description OrganisationReq model containing all organisation request related information.
+//
+//	@Example {
+//	  "org_id": "12345",
+//	  "org_name": "Acme Corp",
+//	  "status": "Active"
+//	}
+type OrganisationReq struct {
+	OrgId   string             `json:"org_id" bson:"org_id" example:"12345"`         // Organisation ID
+	OrgName string             `json:"org_name" bson:"org_name" example:"Acme Corp"` // Organisation Name
+	Status  OrganisationStatus `json:"status" bson:"status" example:"Active"`        // Organisation Status
+}
+
 // Organisation represents an organisation in the system.
 // @Description Organisation model containing all organisation-related information.
 //

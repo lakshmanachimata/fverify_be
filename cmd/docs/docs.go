@@ -152,7 +152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Organisation"
+                            "$ref": "#/definitions/models.OrganisationReq"
                         }
                     }
                 ],
@@ -184,7 +184,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organisations/{orgId}": {
+        "/organisations/{org_id}": {
             "put": {
                 "description": "Update an existing organisation's details",
                 "consumes": [
@@ -208,7 +208,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation ID",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "path",
                         "required": true
                     },
@@ -218,7 +218,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Organisation"
+                            "$ref": "#/definitions/models.OrganisationReq"
                         }
                     }
                 ],
@@ -339,7 +339,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -406,7 +406,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     }
@@ -470,7 +470,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -536,7 +536,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     }
@@ -588,7 +588,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -762,7 +762,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -841,7 +841,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation Id",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -979,12 +979,12 @@ const docTemplate = `{
             "description": "Login request payload containing username and password.",
             "type": "object",
             "required": [
-                "orgId",
+                "org_id",
                 "password",
                 "username"
             ],
             "properties": {
-                "orgId": {
+                "org_id": {
                     "description": "Organization ID",
                     "type": "string",
                     "example": "123456"
@@ -1060,6 +1060,31 @@ const docTemplate = `{
                     "description": "Auto-generated UUID",
                     "type": "string",
                     "example": "uuid-v4"
+                },
+                "status": {
+                    "description": "Organisation Status",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.OrganisationStatus"
+                        }
+                    ],
+                    "example": "Active"
+                }
+            }
+        },
+        "models.OrganisationReq": {
+            "description": "OrganisationReq model containing all organisation request related information.",
+            "type": "object",
+            "properties": {
+                "org_id": {
+                    "description": "Organisation ID",
+                    "type": "string",
+                    "example": "12345"
+                },
+                "org_name": {
+                    "description": "Organisation Name",
+                    "type": "string",
+                    "example": "Acme Corp"
                 },
                 "status": {
                     "description": "Organisation Status",
