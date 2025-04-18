@@ -331,17 +331,29 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	if targetUser.UserId != reqUser.UserId {
+		c.JSON(http.StatusForbidden, gin.H{"error": "User Id cannot be updated"})
+		return
+	}
+
+	if targetUser.Username != reqUser.Username {
+		c.JSON(http.StatusForbidden, gin.H{"error": "User Name cannot be updated"})
+		return
+	}
+
 	// Update user data
 	var user models.UserModel
 	user.UId = uIdParam
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
-	user.Password = reqUser.Password
 	user.Role = reqUser.Role
 	user.Status = reqUser.Status
 	user.Remarks = reqUser.Remarks
 	user.MobileNumber = reqUser.MobileNumber
 	user.OrgUUID = authUser.OrgUUID
+	if reqUser.Password != "" {
+		user.Password = reqUser.Password
+	}
 
 	uUser, err := uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
 	if err != nil {
@@ -522,6 +534,31 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 		return
 	}
 
+	if reqUser.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is required"})
+		return
+	}
+	if reqUser.UserId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "UserId is required"})
+		return
+	}
+	if reqUser.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username is required"})
+		return
+	}
+	if reqUser.Role == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Role is required"})
+		return
+	}
+	if reqUser.Status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Status is required"})
+		return
+	}
+	if reqUser.MobileNumber == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "MobileNumber is required"})
+		return
+	}
+
 	var user models.UserModel
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
@@ -657,12 +694,50 @@ func (uc *UserController) GetUserRoles(c *gin.Context) {
 
 	// Return the list of user roles
 	roles := []string{
-		string(models.Admin),
 		string(models.OperationsLead),
 		string(models.FieldLead),
 		string(models.FieldExecutive),
-		string(models.Owner),
 		string(models.OperationsExecutive),
 	}
 	c.JSON(http.StatusOK, roles)
+}
+
+// GetUserStatuses godoc
+// @Summary Get user statuses
+// @Description Retrieve all user statuses defined in the system
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param org_id  header string true "Organisation Id"
+// @Success 200 {array} string
+// @Failure 500 {object} InternalErrorResponse
+// @Router /api/v1/users/statuses [get]
+func (uc *UserController) GetUserStatuses(c *gin.Context) {
+	// Return the list of user statuses
+	org_id := c.GetHeader("org_id")
+	if org_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found or inactive"})
+		return
+	}
+	statuses := []string{
+		string(models.Created),
+		string(models.Confirmed),
+		string(models.Verified),
+		string(models.Active),
+		string(models.InActive),
+		string(models.Disabled),
+		string(models.Banned),
+	}
+	c.JSON(http.StatusOK, statuses)
 }

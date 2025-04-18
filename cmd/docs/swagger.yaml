@@ -523,7 +523,6 @@ definitions:
     required:
     - mobile_number
     - org_id
-    - password
     - remarks
     - role
     - status
@@ -1145,6 +1144,33 @@ paths:
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Get user roles
+      tags:
+      - Users
+  /api/v1/users/statuses:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all user statuses defined in the system
+      parameters:
+      - description: Organisation Id
+        in: header
+        name: org_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Get user statuses
       tags:
       - Users
   /api/v1/users/uid/{uId}:

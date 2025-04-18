@@ -126,7 +126,7 @@ type UserModel struct {
 type UserReqModel struct {
 	UserId       string     `bson:"userid" json:"userid" binding:"required" example:"112345"`                         // Unique identifier for the user
 	Username     string     `bson:"username" json:"username"  binding:"required" example:"john_doe"`                  // Username of the user
-	Password     string     `bson:"password" json:"password"  binding:"required" example:"plane_password"`            // Hashed password
+	Password     string     `bson:"password" json:"password"   example:"plane_password"`                              // Hashed password
 	Role         Role       `bson:"role" json:"role"  binding:"required" example:"Admin"`                             // Role of the user
 	Status       UserStatus `bson:"status" json:"status"  binding:"required" example:"Active"`                        // Status of the user
 	Remarks      string     `bson:"remarks" json:"remarks"  binding:"required" example:"User is active and verified"` // Additional remarks about the user

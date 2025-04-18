@@ -747,6 +747,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/users/statuses": {
+            "get": {
+                "description": "Retrieve all user statuses defined in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user statuses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users/uid/{uId}": {
             "put": {
                 "description": "Update an existing user's details",
@@ -1684,7 +1725,6 @@ const docTemplate = `{
             "required": [
                 "mobile_number",
                 "org_id",
-                "password",
                 "remarks",
                 "role",
                 "status",

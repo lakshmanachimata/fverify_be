@@ -122,6 +122,7 @@ func main() {
 		api.POST("/users/admin/create", auth.APIKeyMiddleware(), userController.CreateAdmin)
 		api.POST("/users/owner/create", auth.APIKeyMiddleware(), userController.CreateOwner)
 		api.GET("/users/roles", userController.GetUserRoles)
+		api.GET("/users/statuses", userController.GetUserStatuses)
 		api.POST("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead"), prospectController.CreateProspect)
 		api.GET("/prospects/:uid", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
 		api.PUT("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.UpdateProspect)
