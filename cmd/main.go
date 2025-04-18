@@ -112,7 +112,7 @@ func main() {
 		// api.DELETE("/organisations/:org_id", auth.OrgAPIKeyMiddleware(), organisationController.DeleteOrganisation)
 		api.GET("/organisations", auth.OrgAPIKeyMiddleware(), organisationController.GetAllOrganisations)
 		api.POST("/users/login", userController.LoginUser)
-		api.POST("/users", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner"), userController.CreateUser)
+		api.POST("/users", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead"), userController.CreateUser)
 		api.PUT("/users/uid/:uId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.UpdateUser)
 		api.GET("/users", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetAllUsers)
 		api.GET("/users/:userId", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive"), userController.GetUserByUserID)

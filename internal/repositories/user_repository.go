@@ -148,6 +148,13 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel,
 	if err != nil {
 		return nil, err
 	}
+	if user.Password != "" {
+		hashedPassword, err := HashPassword(user.Password)
+		if err != nil {
+			return nil, err
+		}
+		user.Password = hashedPassword // Set the hashed password
+	}
 
 	// Generate a diff between the existing user and the incoming user
 	var updateComments []string
@@ -186,6 +193,9 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel,
 		bson.M{"uid": user.UId}, // Filter by uId
 		bson.M{"$set": user},    // Update the user document
 	)
+	if err != nil {
+		return nil, err
+	}
 	// Convert to UserRespModel
 	createdUserResp := models.UserRespModel{
 		UId:           user.UId,

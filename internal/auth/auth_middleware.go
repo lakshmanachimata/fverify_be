@@ -85,7 +85,7 @@ func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo reposi
 			}
 		}
 
-		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient permissions to access this resource"})
 		c.Abort()
 	}
 }
