@@ -198,6 +198,72 @@ const docTemplate = `{
             }
         },
         "/api/v1/prospects": {
+            "get": {
+                "description": "Retrieve a list of prospects with pagination using skip and limit values",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prospects"
+                ],
+                "summary": "Get a list of prospects",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of records to skip",
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of records to retrieve",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ProspectModel"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new prospect in the system",
                 "consumes": [
@@ -1350,6 +1416,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "EMP123"
                 },
+                "emp_id_verified": {
+                    "description": "Employee ID verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "employment_type": {
                     "description": "Employment type (\"Employee\" or \"Business\")",
                     "allOf": [
@@ -1374,6 +1445,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "9876543210"
                 },
+                "mobile_verified": {
+                    "description": "Mobile verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name_verified": {
+                    "description": "Name verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "net_salary": {
                     "description": "Net salary",
                     "type": "number",
@@ -1383,6 +1464,11 @@ const docTemplate = `{
                     "description": "Number of family members",
                     "type": "integer",
                     "example": 4
+                },
+                "off_address_verified": {
+                    "description": "Office address verification status",
+                    "type": "boolean",
+                    "example": true
                 },
                 "office_address": {
                     "description": "Office address",
@@ -1419,6 +1505,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Prospect is under review"
                 },
+                "res_address_verified": {
+                    "description": "Residential address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "residential_address": {
                     "description": "Residential address",
                     "type": "string",
@@ -1428,6 +1519,11 @@ const docTemplate = `{
                     "description": "Role in the organization",
                     "type": "string",
                     "example": "Manager"
+                },
+                "role_verified": {
+                    "description": "Role verification status",
+                    "type": "boolean",
+                    "example": true
                 },
                 "status": {
                     "description": "Current status of the prospect",
@@ -1505,6 +1601,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "EMP123"
                 },
+                "emp_id_verified": {
+                    "description": "Employee ID verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "employment_type": {
                     "description": "Employment type (\"Employee\" or \"Business\")",
                     "allOf": [
@@ -1529,6 +1630,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "9876543210"
                 },
+                "mobile_verified": {
+                    "description": "Mobile verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name_verified": {
+                    "description": "Name verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "net_salary": {
                     "description": "Net salary",
                     "type": "number",
@@ -1538,6 +1649,11 @@ const docTemplate = `{
                     "description": "Number of family members",
                     "type": "integer",
                     "example": 4
+                },
+                "off_address_verified": {
+                    "description": "Office address verification status",
+                    "type": "boolean",
+                    "example": true
                 },
                 "office_address": {
                     "description": "Office address",
@@ -1574,6 +1690,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Prospect is under review"
                 },
+                "res_address_verified": {
+                    "description": "Residential address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "residential_address": {
                     "description": "Residential address",
                     "type": "string",
@@ -1583,6 +1704,11 @@ const docTemplate = `{
                     "description": "Role in the organization",
                     "type": "string",
                     "example": "Manager"
+                },
+                "role_verified": {
+                    "description": "Role verification status",
+                    "type": "boolean",
+                    "example": true
                 },
                 "status": {
                     "description": "Current status of the prospect",

@@ -33,3 +33,6 @@ func (s *ProspectService) DeleteProspect(ctx context.Context, id string) error {
 func (s *ProspectService) ListProspects(ctx context.Context) ([]*models.ProspectModel, error) {
 	return s.repo.FindAll(ctx)
 }
+func (s *ProspectService) GetProspects(ctx context.Context, skip int, limit int) ([]models.ProspectModel, error) {
+	return s.repo.GetProspects(ctx, skip, limit)
+}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,53 @@ type ProspectController struct {
 
 func NewProspectController(service *services.ProspectService) *ProspectController {
 	return &ProspectController{Service: service}
+}
+
+// GetProspects godoc
+// @Summary Get a list of prospects
+// @Description Retrieve a list of prospects with pagination using skip and limit values
+// @Tags Prospects
+// @Accept json
+// @Produce json
+// @Param skip query int false "Number of records to skip" default(0)
+// @Param limit query int false "Number of records to retrieve" default(10)
+// @Param Authorization header string true "Bearer token"
+// @Param org_id header string true "Organisation Id"
+// @Success 200 {array} models.ProspectModel
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} InternalErrorResponse
+// @Router /api/v1/prospects [get]
+func (pc *ProspectController) GetProspects(c *gin.Context) {
+	// Parse query parameters
+	skip := 0
+	limit := 10
+
+	if s := c.Query("skip"); s != "" {
+		if parsedSkip, err := strconv.Atoi(s); err == nil {
+			skip = parsedSkip
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid skip value"})
+			return
+		}
+	}
+
+	if l := c.Query("limit"); l != "" {
+		if parsedLimit, err := strconv.Atoi(l); err == nil {
+			limit = parsedLimit
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
+			return
+		}
+	}
+
+	// Call the service to get prospects
+	prospects, err := pc.Service.GetProspects(c.Request.Context(), skip, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve prospects"})
+		return
+	}
+
+	c.JSON(http.StatusOK, prospects)
 }
 
 // CreateProspect godoc
@@ -72,6 +120,12 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 	}
 	// Assign unique ID and timestamps
 	prospect.UId = uuid.New().String()
+	prospect.NameVerified = false
+	prospect.MobileVerified = false
+	prospect.ResAddressVerified = false
+	prospect.OffAddressVerified = false
+	prospect.RoleVerified = false
+	prospect.EmpIdVerified = false
 	prospect.CreatedBy = authUser.Username
 	prospect.CreatedTime = time.Now().UTC().Format(time.RFC3339) // Get current UTC time as string
 	prospect.UpdatedBy = authUser.Username
@@ -223,6 +277,24 @@ func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 	if existingProspect.Remarks != reqProspect.Remarks && reqProspect.Remarks != "" {
 		updateComments = append(updateComments, "Remarks updated")
 	}
+	if existingProspect.NameVerified != reqProspect.NameVerified {
+		updateComments = append(updateComments, "NameVerified updated")
+	}
+	if existingProspect.MobileVerified != reqProspect.MobileVerified {
+		updateComments = append(updateComments, "MobileVerified updated")
+	}
+	if existingProspect.ResAddressVerified != reqProspect.ResAddressVerified {
+		updateComments = append(updateComments, "Residential Address updated")
+	}
+	if existingProspect.OffAddressVerified != reqProspect.OffAddressVerified {
+		updateComments = append(updateComments, "Office Address updated")
+	}
+	if existingProspect.RoleVerified != reqProspect.RoleVerified {
+		updateComments = append(updateComments, "Role / Business updated")
+	}
+	if existingProspect.ResAddressVerified != reqProspect.ResAddressVerified {
+		updateComments = append(updateComments, "Employee Id / Business Id updated")
+	}
 
 	// Map updated fields from ProspecReqtModel to ProspectModel
 	existingProspect.ProspectId = reqProspect.ProspectId
@@ -250,6 +322,12 @@ func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 	existingProspect.ColleagueMobile = reqProspect.ColleagueMobile
 	existingProspect.UploadedImages = reqProspect.UploadedImages
 	existingProspect.Remarks = reqProspect.Remarks
+	existingProspect.NameVerified = reqProspect.NameVerified
+	existingProspect.MobileVerified = reqProspect.MobileVerified
+	existingProspect.ResAddressVerified = reqProspect.ResAddressVerified
+	existingProspect.OffAddressVerified = reqProspect.OffAddressVerified
+	existingProspect.RoleVerified = reqProspect.RoleVerified
+	existingProspect.EmpIdVerified = reqProspect.EmpIdVerified
 
 	// Update timestamps and history
 	existingProspect.UpdatedBy = authUser.Username

@@ -126,7 +126,9 @@ func main() {
 		api.POST("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead"), prospectController.CreateProspect)
 		api.GET("/prospects/:uid", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
 		api.PUT("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.UpdateProspect)
+		api.GET("/prospects", prospectController.GetProspects)
 	}
+
 	// Start the server
 	if err := router.Run(":9000"); err != nil {
 		log.Fatal(err)

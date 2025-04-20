@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type ProspectRepositoryImpl struct {
@@ -53,5 +54,22 @@ func (r *ProspectRepositoryImpl) FindAll(ctx context.Context) ([]*models.Prospec
 		}
 		prospects = append(prospects, &prospect)
 	}
+	return prospects, nil
+}
+func (r *ProspectRepositoryImpl) GetProspects(ctx context.Context, skip int, limit int) ([]models.ProspectModel, error) {
+	var prospects []models.ProspectModel
+
+	// MongoDB query with skip and limit
+	cursor, err := r.collection.Find(ctx, bson.M{}, options.Find().SetSkip(int64(skip)).SetLimit(int64(limit)))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	// Decode the results
+	if err := cursor.All(ctx, &prospects); err != nil {
+		return nil, err
+	}
+
 	return prospects, nil
 }
