@@ -219,7 +219,7 @@ func (pc *ProspectController) GetProspect(c *gin.Context) {
 // @Router /api/v1/prospects/{uid} [put]
 func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 	claims, _ := c.Get("user")
-	authUser := claims.(models.UserModel)
+	authUser := claims.(*auth.AuthTokenClaims)
 	uId := c.Param("uid")
 
 	// Fetch the existing prospect
@@ -289,7 +289,7 @@ func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 	if existingProspect.Status != reqProspect.Status && reqProspect.Status != "" {
 		updateComments = append(updateComments, "Status updated")
 	}
-	if existingProspect.PreviousExperience != reqProspect.PreviousExperience && reqProspect.PreviousExperience != "" {
+	if existingProspect.PreviousExperience != reqProspect.PreviousExperience {
 		updateComments = append(updateComments, "PreviousExperience updated")
 	}
 	if existingProspect.GrossSalary != reqProspect.GrossSalary && reqProspect.GrossSalary > 0 {

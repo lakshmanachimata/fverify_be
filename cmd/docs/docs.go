@@ -1530,8 +1530,8 @@ const docTemplate = `{
                 },
                 "previous_experience": {
                     "description": "Previous experience",
-                    "type": "string",
-                    "example": "5 years in sales"
+                    "type": "integer",
+                    "example": 5
                 },
                 "prospect_id": {
                     "description": "Unique prospect ID",
@@ -1715,8 +1715,8 @@ const docTemplate = `{
                 },
                 "previous_experience": {
                     "description": "Previous experience",
-                    "type": "string",
-                    "example": "5 years in sales"
+                    "type": "integer",
+                    "example": 5
                 },
                 "prospect_id": {
                     "description": "Unique prospect ID",

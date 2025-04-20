@@ -55,7 +55,7 @@ const (
 //	  "emp_id": "EMP123",
 //	  "emp_id_verified": false,
 //	  "status": "Pending",
-//	  "previous_experience": "5 years in sales",
+//	  "previous_experience": 5,
 //	  "gross_salary": 50000.00,
 //	  "net_salary": 40000.00,
 //	  "colleague_name": "Mark Smith",
@@ -89,7 +89,7 @@ type ProspectModel struct {
 	EmpId                 string          `bson:"emp_id" json:"emp_id" example:"EMP123"`                                             // Employee ID
 	EmpIdVerified         bool            `bson:"emp_id_verified" json:"emp_id_verified" example:"true"`                             // Employee ID verification status
 	Status                ProspectStatus  `bson:"status" json:"status" example:"Pending"`                                            // Current status of the prospect
-	PreviousExperience    string          `bson:"previous_experience" json:"previous_experience" example:"5 years in sales"`         // Previous experience
+	PreviousExperience    int             `bson:"previous_experience" json:"previous_experience" example:"5"`                        // Previous experience
 	GrossSalary           float64         `bson:"gross_salary" json:"gross_salary" example:"50000.00"`                               // Gross salary
 	NetSalary             float64         `bson:"net_salary" json:"net_salary" example:"40000.00"`                                   // Net salary
 	ColleagueName         string          `bson:"colleague_name" json:"colleague_name" example:"Mark Smith"`                         // Name of a colleague
@@ -131,7 +131,7 @@ type ProspectModel struct {
 //	  "emp_id": "EMP123",
 //	  "emp_id_verified": false,
 //	  "status": "Pending",
-//	  "previous_experience": "5 years in sales",
+//	  "previous_experience": 5,
 //	  "gross_salary": 50000.00,
 //	  "net_salary": 40000.00,
 //	  "colleague_name": "Mark Smith",
@@ -164,7 +164,7 @@ type ProspecReqtModel struct {
 	EmpId                 string         `bson:"emp_id" json:"emp_id" example:"EMP123"`                                             // Employee ID
 	EmpIdVerified         bool           `bson:"emp_id_verified" json:"emp_id_verified" example:"true"`                             // Employee ID verification status
 	Status                ProspectStatus `bson:"status" json:"status" example:"Pending"`                                            // Current status of the prospect
-	PreviousExperience    string         `bson:"previous_experience" json:"previous_experience" example:"5 years in sales"`         // Previous experience
+	PreviousExperience    int            `bson:"previous_experience" json:"previous_experience" example:"5"`                        // Previous experience
 	GrossSalary           float64        `bson:"gross_salary" json:"gross_salary" example:"50000.00"`                               // Gross salary
 	NetSalary             float64        `bson:"net_salary" json:"net_salary" example:"40000.00"`                                   // Net salary
 	ColleagueName         string         `bson:"colleague_name" json:"colleague_name" example:"Mark Smith"`                         // Name of a colleague
