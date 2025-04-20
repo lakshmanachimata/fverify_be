@@ -13,12 +13,38 @@ import (
 	"github.com/google/uuid"
 )
 
+type ProspectCountMessage struct {
+	Count int `json:"count"`
+}
+
 type ProspectController struct {
 	Service *services.ProspectService
 }
 
 func NewProspectController(service *services.ProspectService) *ProspectController {
 	return &ProspectController{Service: service}
+}
+
+// GetProspectsCount godoc
+// @Summary Get total count of prospects
+// @Description Retrieve the total count of prospects in the system
+// @Tags Prospects
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param org_id header string true "Organisation Id"
+// @Success 200 {object} ProspectCountMessage
+// @Failure 500 {object} InternalErrorResponse
+// @Router /api/v1/prospects/count [get]
+func (pc *ProspectController) GetProspectsCount(c *gin.Context) {
+	// Call the service to get the total count of prospects
+	count, err := pc.Service.GetProspectsCount(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve prospects count"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count": count})
 }
 
 // GetProspects godoc

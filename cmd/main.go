@@ -127,6 +127,7 @@ func main() {
 		api.GET("/prospects/:uid", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.GetProspect)
 		api.PUT("/prospects", auth.AuthMiddleware(*orgRepo, *userRepo, "Admin", "Owner", "Operations Lead", "Operations Executive", "Field Lead", "Field Executive"), prospectController.UpdateProspect)
 		api.GET("/prospects", prospectController.GetProspects)
+		api.GET("/prospects/count", prospectController.GetProspectsCount)
 	}
 
 	// Start the server

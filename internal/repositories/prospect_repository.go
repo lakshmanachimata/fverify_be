@@ -73,3 +73,12 @@ func (r *ProspectRepositoryImpl) GetProspects(ctx context.Context, skip int, lim
 
 	return prospects, nil
 }
+
+func (r *ProspectRepositoryImpl) GetProspectsCount(ctx context.Context) (int, error) {
+	// MongoDB query to count documents
+	count, err := r.collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+	return int(count), nil
+}

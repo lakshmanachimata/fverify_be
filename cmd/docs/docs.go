@@ -323,6 +323,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/prospects/count": {
+            "get": {
+                "description": "Retrieve the total count of prospects in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prospects"
+                ],
+                "summary": "Get total count of prospects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ProspectCountMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/prospects/{id}": {
             "get": {
                 "description": "Retrieve a prospect by their unique ID",
@@ -1223,6 +1268,14 @@ const docTemplate = `{
                     "description": "Error message",
                     "type": "string",
                     "example": "No data"
+                }
+            }
+        },
+        "controllers.ProspectCountMessage": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
                 }
             }
         },

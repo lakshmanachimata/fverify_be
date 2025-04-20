@@ -55,6 +55,11 @@ definitions:
         example: No data
         type: string
     type: object
+  controllers.ProspectCountMessage:
+    properties:
+      count:
+        type: integer
+    type: object
   controllers.SuccessResponse:
     properties:
       message:
@@ -956,6 +961,36 @@ paths:
           schema:
             $ref: '#/definitions/controllers.InternalErrorResponse'
       summary: Update an existing prospect
+      tags:
+      - Prospects
+  /api/v1/prospects/count:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the total count of prospects in the system
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Organisation Id
+        in: header
+        name: org_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.ProspectCountMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.InternalErrorResponse'
+      summary: Get total count of prospects
       tags:
       - Prospects
   /api/v1/users:

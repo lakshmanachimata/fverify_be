@@ -36,3 +36,6 @@ func (s *ProspectService) ListProspects(ctx context.Context) ([]*models.Prospect
 func (s *ProspectService) GetProspects(ctx context.Context, skip int, limit int) ([]models.ProspectModel, error) {
 	return s.repo.GetProspects(ctx, skip, limit)
 }
+func (s *ProspectService) GetProspectsCount(ctx context.Context) (int, error) {
+	return s.repo.GetProspectsCount(ctx)
+}
