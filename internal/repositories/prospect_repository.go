@@ -20,7 +20,10 @@ func NewProspectRepository(client *mongo.Client, dbName, collectionName string) 
 
 func (r *ProspectRepositoryImpl) Create(ctx context.Context, prospect *models.ProspectModel) error {
 	_, err := r.collection.InsertOne(ctx, prospect)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *ProspectRepositoryImpl) GetByID(ctx context.Context, id string) (*models.ProspectModel, error) {

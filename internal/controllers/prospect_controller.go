@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"fverify_be/internal/auth"
 	"fverify_be/internal/models"
 	"fverify_be/internal/services"
 
@@ -37,6 +38,8 @@ func NewProspectController(service *services.ProspectService) *ProspectControlle
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/prospects/count [get]
 func (pc *ProspectController) GetProspectsCount(c *gin.Context) {
+	// claims, _ := c.Get("user")
+	// authUser := claims.(*auth.AuthTokenClaims)
 	// Call the service to get the total count of prospects
 	count, err := pc.Service.GetProspectsCount(c.Request.Context())
 	if err != nil {
@@ -62,6 +65,8 @@ func (pc *ProspectController) GetProspectsCount(c *gin.Context) {
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/prospects [get]
 func (pc *ProspectController) GetProspects(c *gin.Context) {
+	// claims, _ := c.Get("user")
+	// authUser := claims.(*auth.AuthTokenClaims)
 	// Parse query parameters
 	skip := 0
 	limit := 10
@@ -109,7 +114,7 @@ func (pc *ProspectController) GetProspects(c *gin.Context) {
 // @Router /api/v1/prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
 	claims, _ := c.Get("user")
-	authUser := claims.(models.UserModel)
+	authUser := claims.(*auth.AuthTokenClaims)
 	var reqProspect models.ProspecReqtModel
 	if err := c.ShouldBindJSON(&reqProspect); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -167,7 +172,7 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Prospect created"})
+	c.JSON(http.StatusCreated, prospect)
 }
 
 // GetProspect godoc
@@ -186,6 +191,8 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Router /api/v1/prospects/{id} [get]
 func (pc *ProspectController) GetProspect(c *gin.Context) {
 	uid := c.Param("uid")
+	// claims, _ := c.Get("user")
+	// authUser := claims.(*auth.AuthTokenClaims)
 	prospect, err := pc.Service.GetProspectByID(c.Request.Context(), uid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Prospect not found"})
