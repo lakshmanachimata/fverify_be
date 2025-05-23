@@ -11,26 +11,28 @@ import (
 var jwtSecret = []byte("your_secret_key") // Replace with a secure secret key
 
 type AuthTokenClaims struct {
-	UserId       string `json:"userId"`
-	Username     string `json:"username"`
+	UserId       string `json:"user_id"`
+	UId          string `json:"uid"`
+	Username     string `json:"user_name"`
 	Role         string `json:"role"`
 	Status       string `json:"status"`
-	MobileNumber string `json:"mobileNumber"`
-	OrgId        string `json:"orgId"`
+	MobileNumber string `json:"mobile_number"`
+	OrgUUID      string `json:"org_uuid"`
 	jwt.RegisteredClaims
 }
 
 // GenerateAuthToken generates a JWT token for the user
-func GenerateAuthToken(userId, username, role, status, mobileNumber, orgId string) (string, error) {
+func GenerateAuthToken(userId, username, uid, role, status, mobileNumber, orgUUID string) (string, error) {
 	claims := AuthTokenClaims{
 		UserId:       userId,
+		UId:          uid,
 		Username:     username,
 		Role:         role,
 		Status:       status,
 		MobileNumber: mobileNumber,
-		OrgId:        orgId,
+		OrgUUID:      orgUUID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // Token valid for 24 hours
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(90 * 24 * time.Hour)), // Token valid for 24 hours
 		},
 	}
 
@@ -54,15 +56,6 @@ func ParseAuthToken(tokenString string) (*AuthTokenClaims, error) {
 	}
 
 	return claims, nil
-}
-
-// HashPassword hashes a plain-text password using bcrypt
-func HashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hashedPassword), nil
 }
 
 // ComparePassword compares a hashed password with a plain-text password

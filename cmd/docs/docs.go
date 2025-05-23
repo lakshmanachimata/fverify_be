@@ -15,66 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/create": {
-            "post": {
-                "description": "Create a new admin user in the system (requires API key)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Create a new admin user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "API key",
-                        "name": "X-API-Key",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Admin user data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserModel"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.UserModel"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InternalErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/organisations": {
+        "/api/v1/organisations": {
             "get": {
                 "description": "Retrieve all organisations in the system",
                 "consumes": [
@@ -87,6 +28,15 @@ const docTemplate = `{
                     "Organisations"
                 ],
                 "summary": "Get all organisations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -143,7 +93,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Organisation"
+                            "$ref": "#/definitions/models.OrganisationReq"
                         }
                     }
                 ],
@@ -175,7 +125,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/organisations/{orgId}": {
+        "/api/v1/organisations/{org_id}": {
             "put": {
                 "description": "Update an existing organisation's details",
                 "consumes": [
@@ -199,7 +149,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Organisation ID",
-                        "name": "orgId",
+                        "name": "org_id",
                         "in": "path",
                         "required": true
                     },
@@ -209,7 +159,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Organisation"
+                            "$ref": "#/definitions/models.OrganisationReq"
                         }
                     }
                 ],
@@ -247,9 +197,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/owner/create": {
-            "post": {
-                "description": "Create a new admin user in the system (requires API key)",
+        "/api/v1/prospects": {
+            "get": {
+                "description": "Retrieve a list of prospects with pagination using skip and limit values",
                 "consumes": [
                     "application/json"
                 ],
@@ -257,42 +207,51 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Prospects"
                 ],
-                "summary": "Create a new owner",
+                "summary": "Get a list of prospects",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of records to skip",
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of records to retrieve",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
-                        "description": "API key",
-                        "name": "X-API-Key",
+                        "description": "Bearer token",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
                     {
-                        "description": "Admin user data",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserModel"
-                        }
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ProspectModel"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/controllers.ErrorResponse"
                         }
@@ -304,9 +263,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/prospects": {
+            },
             "post": {
                 "description": "Create a new prospect in the system",
                 "consumes": [
@@ -321,12 +278,26 @@ const docTemplate = `{
                 "summary": "Create a new prospect",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Prospect data",
                         "name": "prospect",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ProspectModel"
+                            "$ref": "#/definitions/models.ProspecReqtModel"
                         }
                     }
                 ],
@@ -352,7 +323,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/prospects/{id}": {
+        "/api/v1/prospects/count": {
+            "get": {
+                "description": "Retrieve the total count of prospects in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prospects"
+                ],
+                "summary": "Get total count of prospects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ProspectCountMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/prospects/{id}": {
             "get": {
                 "description": "Retrieve a prospect by their unique ID",
                 "consumes": [
@@ -368,9 +384,23 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Prospect ID",
-                        "name": "id",
+                        "description": "Prospect UID",
+                        "name": "uid",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -402,7 +432,80 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/api/v1/prospects/{uid}": {
+            "put": {
+                "description": "Update an existing prospect in the system. Update comments are generated based on differences from the earlier prospect state.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Prospects"
+                ],
+                "summary": "Update an existing prospect",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Prospect UId",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated prospect data",
+                        "name": "prospect",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProspecReqtModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ProspectModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
             "get": {
                 "description": "Retrieve all users in the system",
                 "consumes": [
@@ -422,6 +525,13 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -430,7 +540,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.UserModel"
+                                "$ref": "#/definitions/models.UserRespModel"
                             }
                         }
                     },
@@ -469,12 +579,19 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "User data",
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User data (all fields are mandatory)",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserReqModel"
                         }
                     }
                 ],
@@ -482,7 +599,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -506,7 +623,66 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/login": {
+        "/api/v1/users/admin/create": {
+            "post": {
+                "description": "Create a new admin user in the system (requires API key)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new admin user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Admin user data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserReqModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRespModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/login": {
             "post": {
                 "description": "Validate username and password, and return user details with a token",
                 "consumes": [
@@ -558,7 +734,66 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/roles": {
+        "/api/v1/users/owner/create": {
+            "post": {
+                "description": "Create a new admin user in the system (requires API key)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new owner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User data (all fields are mandatory)",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserReqModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRespModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/roles": {
             "get": {
                 "description": "Retrieve all user roles for a given organisation",
                 "consumes": [
@@ -574,9 +809,9 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Organisation ID",
-                        "name": "orgId",
-                        "in": "query",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -623,7 +858,48 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/uid/{uId}": {
+        "/api/v1/users/statuses": {
+            "get": {
+                "description": "Retrieve all user statuses defined in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user statuses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InternalErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/uid/{uId}": {
             "put": {
                 "description": "Update an existing user's details",
                 "consumes": [
@@ -645,19 +921,26 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "User uId",
                         "name": "uId",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Updated user data",
+                        "description": "User data (all fields are mandatory)",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserReqModel"
                         }
                     }
                 ],
@@ -665,7 +948,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -693,61 +976,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete a user by their unique uId",
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete a user by uId",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User uId",
-                        "name": "uId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.InvalidAuthResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    }
-                }
             }
         },
-        "/users/uid/{uId}/setpassword": {
+        "/api/v1/users/uid/{uId}/setpassword": {
             "put": {
                 "description": "Set a new password for a user",
                 "consumes": [
@@ -765,6 +996,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Bearer token",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     },
@@ -825,7 +1063,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/userid/{userId}": {
+        "/api/v1/users/userid/{userId}": {
             "delete": {
                 "description": "Delete a user by their unique userId",
                 "tags": [
@@ -844,6 +1082,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Bearer token",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
                         "in": "header",
                         "required": true
                     }
@@ -879,7 +1124,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{userId}": {
+        "/api/v1/users/{userId}": {
             "get": {
                 "description": "Retrieve a user by their unique ID",
                 "consumes": [
@@ -901,6 +1146,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "Organisation Id",
+                        "name": "org_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "User ID",
                         "name": "userId",
@@ -912,7 +1164,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserModel"
+                            "$ref": "#/definitions/models.UserRespModel"
                         }
                     },
                     "400": {
@@ -1019,6 +1271,14 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.ProspectCountMessage": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.SuccessResponse": {
             "type": "object",
             "properties": {
@@ -1029,16 +1289,27 @@ const docTemplate = `{
                 }
             }
         },
+        "models.EmploymentType": {
+            "type": "string",
+            "enum": [
+                "Employee",
+                "Business"
+            ],
+            "x-enum-varnames": [
+                "Employee",
+                "Business"
+            ]
+        },
         "models.LoginRequest": {
             "description": "Login request payload containing username and password.",
             "type": "object",
             "required": [
-                "orgId",
+                "org_id",
                 "password",
                 "username"
             ],
             "properties": {
-                "orgId": {
+                "org_id": {
                     "description": "Organization ID",
                     "type": "string",
                     "example": "123456"
@@ -1081,8 +1352,8 @@ const docTemplate = `{
                 },
                 "uid": {
                     "description": "User's unique ID",
-                    "type": "integer",
-                    "example": 1
+                    "type": "string",
+                    "example": "1"
                 },
                 "userId": {
                     "description": "User's unique identifier",
@@ -1126,6 +1397,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.OrganisationReq": {
+            "description": "OrganisationReq model containing all organisation request related information.",
+            "type": "object",
+            "properties": {
+                "org_id": {
+                    "description": "Organisation ID",
+                    "type": "string",
+                    "example": "12345"
+                },
+                "org_name": {
+                    "description": "Organisation Name",
+                    "type": "string",
+                    "example": "Acme Corp"
+                },
+                "status": {
+                    "description": "Organisation Status",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.OrganisationStatus"
+                        }
+                    ],
+                    "example": "Active"
+                }
+            }
+        },
         "models.OrganisationStatus": {
             "type": "string",
             "enum": [
@@ -1139,7 +1435,7 @@ const docTemplate = `{
                 "OrgInActive"
             ]
         },
-        "models.ProspectModel": {
+        "models.ProspecReqtModel": {
             "description": "Prospect model containing all prospect-related information.",
             "type": "object",
             "properties": {
@@ -1173,9 +1469,18 @@ const docTemplate = `{
                     "type": "string",
                     "example": "EMP123"
                 },
+                "emp_id_verified": {
+                    "description": "Employee ID verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "employment_type": {
                     "description": "Employment type (\"Employee\" or \"Business\")",
-                    "type": "string",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.EmploymentType"
+                        }
+                    ],
                     "example": "Employee"
                 },
                 "gender": {
@@ -1188,15 +1493,20 @@ const docTemplate = `{
                     "type": "number",
                     "example": 50000
                 },
-                "id": {
-                    "description": "Incremental ID",
-                    "type": "integer",
-                    "example": 1
-                },
                 "mobile_number": {
                     "description": "Mobile number of the applicant",
                     "type": "string",
                     "example": "9876543210"
+                },
+                "mobile_verified": {
+                    "description": "Mobile verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name_verified": {
+                    "description": "Name verification status",
+                    "type": "boolean",
+                    "example": true
                 },
                 "net_salary": {
                     "description": "Net salary",
@@ -1208,6 +1518,11 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 4
                 },
+                "off_address_verified": {
+                    "description": "Office address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "office_address": {
                     "description": "Office address",
                     "type": "string",
@@ -1215,8 +1530,8 @@ const docTemplate = `{
                 },
                 "previous_experience": {
                     "description": "Previous experience",
-                    "type": "string",
-                    "example": "5 years in sales"
+                    "type": "integer",
+                    "example": 5
                 },
                 "prospect_id": {
                     "description": "Unique prospect ID",
@@ -1243,6 +1558,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Prospect is under review"
                 },
+                "res_address_verified": {
+                    "description": "Residential address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "residential_address": {
                     "description": "Residential address",
                     "type": "string",
@@ -1253,6 +1573,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Manager"
                 },
+                "role_verified": {
+                    "description": "Role verification status",
+                    "type": "boolean",
+                    "example": true
+                },
                 "status": {
                     "description": "Current status of the prospect",
                     "allOf": [
@@ -1261,6 +1586,213 @@ const docTemplate = `{
                         }
                     ],
                     "example": "Pending"
+                },
+                "uploaded_images": {
+                    "description": "Uploaded images",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"image1.jpg\"",
+                        " \"image2.jpg\"]"
+                    ]
+                },
+                "years_in_current_office": {
+                    "description": "Years in the current office",
+                    "type": "integer",
+                    "example": 3
+                },
+                "years_of_stay": {
+                    "description": "Years of stay at the current address",
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "models.ProspectModel": {
+            "description": "Prospect model containing all prospect-related information.",
+            "type": "object",
+            "properties": {
+                "age": {
+                    "description": "Age of the applicant",
+                    "type": "integer",
+                    "example": 30
+                },
+                "applicant_name": {
+                    "description": "Name of the applicant",
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "colleague_designation": {
+                    "description": "Designation of the colleague",
+                    "type": "string",
+                    "example": "Team Lead"
+                },
+                "colleague_mobile": {
+                    "description": "Mobile number of the colleague",
+                    "type": "string",
+                    "example": "9876543212"
+                },
+                "colleague_name": {
+                    "description": "Name of a colleague",
+                    "type": "string",
+                    "example": "Mark Smith"
+                },
+                "created_by": {
+                    "description": "User who created the prospect",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "created_time": {
+                    "description": "Time when the prospect was created",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
+                },
+                "emp_id": {
+                    "description": "Employee ID",
+                    "type": "string",
+                    "example": "EMP123"
+                },
+                "emp_id_verified": {
+                    "description": "Employee ID verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "employment_type": {
+                    "description": "Employment type (\"Employee\" or \"Business\")",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.EmploymentType"
+                        }
+                    ],
+                    "example": "Employee"
+                },
+                "gender": {
+                    "description": "Gender of the applicant",
+                    "type": "string",
+                    "example": "Male"
+                },
+                "gross_salary": {
+                    "description": "Gross salary",
+                    "type": "number",
+                    "example": 50000
+                },
+                "mobile_number": {
+                    "description": "Mobile number of the applicant",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "mobile_verified": {
+                    "description": "Mobile verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name_verified": {
+                    "description": "Name verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "net_salary": {
+                    "description": "Net salary",
+                    "type": "number",
+                    "example": 40000
+                },
+                "number_of_family_members": {
+                    "description": "Number of family members",
+                    "type": "integer",
+                    "example": 4
+                },
+                "off_address_verified": {
+                    "description": "Office address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "office_address": {
+                    "description": "Office address",
+                    "type": "string",
+                    "example": "456 Office Street"
+                },
+                "previous_experience": {
+                    "description": "Previous experience",
+                    "type": "integer",
+                    "example": 5
+                },
+                "prospect_id": {
+                    "description": "Unique prospect ID",
+                    "type": "string",
+                    "example": "P12345"
+                },
+                "reference_mobile": {
+                    "description": "Mobile number of the reference",
+                    "type": "string",
+                    "example": "9876543211"
+                },
+                "reference_name": {
+                    "description": "Reference name",
+                    "type": "string",
+                    "example": "Jane Doe"
+                },
+                "reference_relation": {
+                    "description": "Relation with the reference",
+                    "type": "string",
+                    "example": "Sister"
+                },
+                "remarks": {
+                    "description": "Additional remarks",
+                    "type": "string",
+                    "example": "Prospect is under review"
+                },
+                "res_address_verified": {
+                    "description": "Residential address verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "residential_address": {
+                    "description": "Residential address",
+                    "type": "string",
+                    "example": "123 Main Street"
+                },
+                "role": {
+                    "description": "Role in the organization",
+                    "type": "string",
+                    "example": "Manager"
+                },
+                "role_verified": {
+                    "description": "Role verification status",
+                    "type": "boolean",
+                    "example": true
+                },
+                "status": {
+                    "description": "Current status of the prospect",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProspectStatus"
+                        }
+                    ],
+                    "example": "Pending"
+                },
+                "uid": {
+                    "description": "unique identifier for the prospect",
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174111"
+                },
+                "update_history": {
+                    "description": "Comments about the last update",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UpdateHistory"
+                    }
+                },
+                "updated_by": {
+                    "description": "User who last updated the prospect",
+                    "type": "string",
+                    "example": "admin"
+                },
+                "updated_time": {
+                    "description": "Time when the prospect was last updated",
+                    "type": "string",
+                    "example": "2023-04-12T15:04:05Z"
                 },
                 "uploaded_images": {
                     "description": "Uploaded images",
@@ -1367,7 +1899,69 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UserModel": {
+        "models.UserReqModel": {
+            "type": "object",
+            "required": [
+                "mobile_number",
+                "org_id",
+                "remarks",
+                "role",
+                "status",
+                "userid",
+                "username"
+            ],
+            "properties": {
+                "mobile_number": {
+                    "description": "Mobile number of the user",
+                    "type": "string",
+                    "example": "9876543210"
+                },
+                "org_id": {
+                    "description": "UUID of the organization",
+                    "type": "string",
+                    "example": "123456"
+                },
+                "password": {
+                    "description": "Hashed password",
+                    "type": "string",
+                    "example": "plane_password"
+                },
+                "remarks": {
+                    "description": "Additional remarks about the user",
+                    "type": "string",
+                    "example": "User is active and verified"
+                },
+                "role": {
+                    "description": "Role of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Role"
+                        }
+                    ],
+                    "example": "Admin"
+                },
+                "status": {
+                    "description": "Status of the user",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.UserStatus"
+                        }
+                    ],
+                    "example": "Active"
+                },
+                "userid": {
+                    "description": "Unique identifier for the user",
+                    "type": "string",
+                    "example": "112345"
+                },
+                "username": {
+                    "description": "Username of the user",
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        },
+        "models.UserRespModel": {
             "description": "User model containing all user-related information.",
             "type": "object",
             "properties": {
@@ -1395,11 +1989,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "123e4567-e89b-12d3-a456-426614174000"
                 },
-                "password": {
-                    "description": "Hashed password",
-                    "type": "string",
-                    "example": "hashed_password"
-                },
                 "remarks": {
                     "description": "Additional remarks about the user",
                     "type": "string",
@@ -1425,8 +2014,8 @@ const docTemplate = `{
                 },
                 "uid": {
                     "description": "Auto-incremented unique identifier",
-                    "type": "integer",
-                    "example": 1
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174111"
                 },
                 "update_history": {
                     "description": "History of updates",
@@ -1483,7 +2072,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "FVerify API",
-	Description:      "This is the API documentation for the Kowtha backend.",
+	Description:      "This is the API documentation for the Fverify backend.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"kowtha_be/internal/models"
+	"fverify_be/internal/models"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -29,17 +29,17 @@ func (r *OrganisationRepository) Create(ctx context.Context, org *models.Organis
 	return org, nil
 }
 
-func (r *OrganisationRepository) Update(ctx context.Context, orgId string, org *models.Organisation) error {
+func (r *OrganisationRepository) Update(ctx context.Context, org_id string, org *models.Organisation) error {
 	_, err := r.collection.UpdateOne(
 		ctx,
-		bson.M{"orgId": orgId},
+		bson.M{"org_id": org_id},
 		bson.M{"$set": org},
 	)
 	return err
 }
 
-func (r *OrganisationRepository) Delete(ctx context.Context, orgId string) error {
-	_, err := r.collection.DeleteOne(ctx, bson.M{"orgId": orgId})
+func (r *OrganisationRepository) Delete(ctx context.Context, org_id string) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"org_id": org_id})
 	return err
 }
 func (r *OrganisationRepository) GetAllOrganisations(ctx context.Context) ([]*models.Organisation, error) {
@@ -59,20 +59,20 @@ func (r *OrganisationRepository) GetAllOrganisations(ctx context.Context) ([]*mo
 	}
 	return organisations, nil
 }
-func (r *OrganisationRepository) IsOrgActive(ctx context.Context, orgId string) (bool, error) {
+func (r *OrganisationRepository) IsOrgActive(ctx context.Context, org_id string) (bool, *models.Organisation) {
 	var org models.Organisation
-	err := r.collection.FindOne(ctx, bson.M{"orgId": orgId, "status": models.Active}).Decode(&org)
+	err := r.collection.FindOne(ctx, bson.M{"org_id": org_id, "status": models.Active}).Decode(&org)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return false, nil
 		}
-		return false, err
+		return false, nil
 	}
-	return true, nil
+	return true, &org
 }
-func (r *OrganisationRepository) GetOrganisationByID(ctx context.Context, orgId string) (*models.Organisation, error) {
+func (r *OrganisationRepository) GetOrganisationByID(ctx context.Context, org_id string) (*models.Organisation, error) {
 	var org models.Organisation
-	err := r.collection.FindOne(ctx, bson.M{"org_id": orgId}).Decode(&org)
+	err := r.collection.FindOne(ctx, bson.M{"org_id": org_id}).Decode(&org)
 	if err != nil {
 		return nil, err
 	}

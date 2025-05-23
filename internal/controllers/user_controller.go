@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
+	"strings"
+	"time"
 
-	"kowtha_be/internal/auth"
-	"kowtha_be/internal/models"
-	"kowtha_be/internal/services"
+	"fverify_be/internal/auth"
+	"fverify_be/internal/models"
+	"fverify_be/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type UserController struct {
@@ -59,21 +61,91 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param user body models.UserModel true "User data"
-// @Success 201 {object} models.UserModel
+// @Param org_id  header string true "Organisation Id"
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users [post]
+// @Router /api/v1/users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	claims, _ := c.Get("user")
+	authUser := claims.(*auth.AuthTokenClaims)
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Ensure uId is not set by the payload
-	user.UId = 0
+	// Validate orgUUID
+	if reqUser.Org_Id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
+		return
+	}
+
+	// Role-based access control
+	switch authUser.Role {
+	case string(models.Owner):
+		// Owner can update all roles, no restrictions
+	case string(models.Admin):
+		if reqUser.Role != models.Admin &&
+			reqUser.Role != models.OperationsLead &&
+			reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins can not create owner"})
+			return
+		}
+	case string(models.OperationsLead):
+		if reqUser.Role != models.OperationsLead &&
+			reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can not create owner / admin"})
+			return
+		}
+	case string(models.OperationsExecutive):
+		if reqUser.Role != models.FieldLead &&
+			reqUser.Role != models.FieldExecutive &&
+			reqUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Executives can not create owner / admin / operations lead"})
+			return
+		}
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+	var user models.UserModel
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Password = reqUser.Password
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgStatus = existingOrg.Status
+	user.OrgUUID = authUser.OrgUUID
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"User created"}, ", "),
+		UpdateBy:        authUser.Username,
+	})
+
+	user.UId = uuid.New().String()
 
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
@@ -91,13 +163,14 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param org_id  header string true "Organisation Id"
 // @Param userId path int true "User ID"
-// @Success 200 {object} models.UserModel
+// @Success 200 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/{userId} [get]
+// @Router /api/v1/users/{userId} [get]
 func (uc *UserController) GetUserByUserID(c *gin.Context) {
 	idParam := c.Param("userId")
 	user, err := uc.Service.GetByUserID(c.Request.Context(), idParam)
@@ -116,10 +189,11 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Success 200 {array} models.UserModel
+// @Param org_id  header string true "Organisation Id"
+// @Success 200 {array} models.UserRespModel
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /users [get]
+// @Router /api/v1/users [get]
 func (uc *UserController) GetAllUsers(c *gin.Context) {
 	users, err := uc.Service.GetAllUsers(c.Request.Context())
 	if err != nil {
@@ -139,34 +213,27 @@ func (uc *UserController) GetAllUsers(c *gin.Context) {
 // @Tags Users
 // @Param uId path int true "User uId"
 // @Param Authorization header string true "Bearer token"
+// @Param org_id  header string true "Organisation Id"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
-// @Router /users/uid/{uId} [delete]
-func (uc *UserController) DeleteUserByUId(c *gin.Context) {
-	uIdParam := c.Param("uId")
-	uId, err := strconv.Atoi(uIdParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Error:   "Invalid uId",
-			Details: "uId must be a valid integer",
-		})
-		return
-	}
+// @Router /api/v1/users/uid/{uId} [delete]
+// func (uc *UserController) DeleteUserByUId(c *gin.Context) {
+// 	uIdParam := c.Param("uId")
 
-	err = uc.Service.DeleteByUId(c.Request.Context(), uId)
-	if err != nil {
-		c.JSON(http.StatusNotFound, ErrorResponse{
-			Error:   "User not found",
-			Details: "No user found with the given uId",
-		})
-		return
-	}
+// 	err = uc.Service.DeleteByUId(c.Request.Context(), uIdParam)
+// 	if err != nil {
+// 		c.JSON(http.StatusNotFound, ErrorResponse{
+// 			Error:   "User not found",
+// 			Details: "No user found with the given uId",
+// 		})
+// 		return
+// 	}
 
-	c.Status(http.StatusNoContent)
-}
+// 	c.Status(http.StatusNoContent)
+// }
 
 // DeleteUserByUserId godoc
 // @Summary Delete a user by userId
@@ -174,12 +241,13 @@ func (uc *UserController) DeleteUserByUId(c *gin.Context) {
 // @Tags Users
 // @Param userId path string true "User userId"
 // @Param Authorization header string true "Bearer token"
+// @Param org_id  header string true "Organisation Id"
 // @Success 204 "No Content"
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/userid/{userId} [delete]
+// @Router /api/v1/users/userid/{userId} [delete]
 func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 	userId := c.Param("userId")
 
@@ -202,47 +270,98 @@ func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
-// @Param uId path int true "User uId"
-// @Param user body models.UserModel true "Updated user data"
-// @Success 200 {object} models.UserModel
+// @Param org_id  header string true "Organisation Id"
+// @Param uId path string true "User uId"
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
+// @Success 200 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/uid/{uId} [put]
+// @Router /api/v1/users/uid/{uId} [put]
 func (uc *UserController) UpdateUser(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
 
 	uIdParam := c.Param("uId")
-	uId, err := strconv.Atoi(uIdParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid uId"})
-		return
-	}
 
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// Ensure the uId in the payload matches the path parameter
-	user.UId = uId
-
-	// Restrict role changes for Operations Lead
-	if authUser.Role == string(models.OperationsLead) && user.Role != "" && string(user.Role) != authUser.Role {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Operations Lead cannot change roles"})
+	// Fetch the target user to validate roles
+	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	err = uc.Service.UpdateUser(c.Request.Context(), &user)
+	// Role-based access control
+	switch authUser.Role {
+	case string(models.Owner):
+		// Owner can update all roles, no restrictions
+	case string(models.Admin):
+		if targetUser.Role != models.Admin &&
+			targetUser.Role != models.OperationsLead &&
+			targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admins can only update specific roles"})
+			return
+		}
+	case string(models.OperationsLead):
+		if targetUser.Role != models.OperationsLead &&
+			targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Leads can only update specific roles"})
+			return
+		}
+	case string(models.OperationsExecutive):
+		if targetUser.Role != models.FieldLead &&
+			targetUser.Role != models.FieldExecutive &&
+			targetUser.Role != models.OperationsExecutive {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Operations Executives can only update specific roles"})
+			return
+		}
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
+	if targetUser.UserId != reqUser.UserId {
+		c.JSON(http.StatusForbidden, gin.H{"error": "User Id cannot be updated"})
+		return
+	}
+
+	if targetUser.Username != reqUser.Username {
+		c.JSON(http.StatusForbidden, gin.H{"error": "User Name cannot be updated"})
+		return
+	}
+
+	// Update user data
+	var user models.UserModel
+	user.UId = uIdParam
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgUUID = authUser.OrgUUID
+	if reqUser.Password != "" {
+		user.Password = reqUser.Password
+	}
+
+	uUser, err := uc.Service.UpdateUser(c.Request.Context(), &user, authUser.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, uUser)
 }
 
 // LoginUser godoc
@@ -256,7 +375,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/login [post]
+// @Router /api/v1/users/login [post]
 func (uc *UserController) LoginUser(c *gin.Context) {
 	var loginRequest models.LoginRequest
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
@@ -265,25 +384,39 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), loginRequest.OrgId)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation, please contact support"})
 		return
 	}
 	if !isActive {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid organisation"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid organisation, please contact support"})
 		return
 	}
 
 	// Validate the user
-	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password, loginRequest.OrgId)
+	user, err := uc.Service.LoginUser(c.Request.Context(), loginRequest.Username, loginRequest.Password, existingOrg.OrgUUID)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
+	if user.Status == models.InActive {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Your account is inactive, please contact support"})
+		return
+	}
+	// Update user status to Active
+	if user.Status != models.Active {
+		err = uc.Service.UpdateUserStatus(c.Request.Context(), user.UserId, string(models.Active))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user status"})
+			return
+		}
+		user.Status = models.Active // Update the status in the user object
+	}
+
 	// Generate the token
-	token, err := auth.GenerateAuthToken(user.UserId, user.Username, string(user.Role), string(user.Status), user.MobileNumber, user.OrgUUID)
+	token, err := auth.GenerateAuthToken(user.UserId, user.Username, user.UId, string(user.Role), string(user.Status), user.MobileNumber, user.OrgUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -308,6 +441,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
+// @Param org_id  header string true "Organisation Id"
 // @Param uId path int true "User uId"
 // @Param password body models.SetPasswordRequest true "New password"
 // @Success 200 {object} SuccessResponse
@@ -316,17 +450,12 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/uid/{uId}/setpassword [put]
+// @Router /api/v1/users/uid/{uId}/setpassword [put]
 func (uc *UserController) SetPassword(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
 
 	uIdParam := c.Param("uId")
-	uId, err := strconv.Atoi(uIdParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid uId"})
-		return
-	}
 
 	var request models.SetPasswordRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -335,7 +464,7 @@ func (uc *UserController) SetPassword(c *gin.Context) {
 	}
 
 	// Fetch the target user to validate roles
-	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uId)
+	targetUser, err := uc.Service.GetByUserUID(c.Request.Context(), uIdParam)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -359,7 +488,7 @@ func (uc *UserController) SetPassword(c *gin.Context) {
 	}
 
 	// Update the password
-	err = uc.Service.SetPassword(c.Request.Context(), uId, request.Password)
+	err = uc.Service.SetPassword(c.Request.Context(), uIdParam, request.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
 		return
@@ -375,24 +504,83 @@ func (uc *UserController) SetPassword(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param X-API-Key header string true "API key"
-// @Param user body models.UserModel true "Admin user data"
-// @Success 201 {object} models.UserModel
+// @Param user body models.UserReqModel true "Admin user data"
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /admin/create [post]
+// @Router /api/v1/users/admin/create [post]
 func (uc *UserController) CreateAdmin(c *gin.Context) {
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
+	// Validate orgUUID
+	if reqUser.Org_Id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
+		return
+	}
+
+	if reqUser.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is required"})
+		return
+	}
+	if reqUser.UserId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "UserId is required"})
+		return
+	}
+	if reqUser.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username is required"})
+		return
+	}
+	if reqUser.Role == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Role is required"})
+		return
+	}
+	if reqUser.Status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Status is required"})
+		return
+	}
+	if reqUser.MobileNumber == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "MobileNumber is required"})
+		return
+	}
+
+	var user models.UserModel
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Password = reqUser.Password
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgStatus = existingOrg.Status
+	user.OrgUUID = existingOrg.OrgUUID
+	user.UId = uuid.New().String()
+
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"Admin created"}, ", "),
+		UpdateBy:        "System",
+	})
 	// Ensure the role is set to Admin
 	user.Role = models.Admin
-
-	// Ensure uId is not set by the payload
-	user.UId = 0
 
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
@@ -410,24 +598,58 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param X-API-Key header string true "API key"
-// @Param user body models.UserModel true "Admin user data"
-// @Success 201 {object} models.UserModel
+// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
+// @Success 201 {object} models.UserRespModel
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /owner/create [post]
+// @Router /api/v1/users/owner/create [post]
 func (uc *UserController) CreateOwner(c *gin.Context) {
-	var user models.UserModel
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var reqUser models.UserReqModel
+	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
+	// Validate orgUUID
+	if reqUser.Org_Id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "orgUUID is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), reqUser.Org_Id)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Organisation is inactive"})
+		return
+	}
+
+	var user models.UserModel
+	user.UserId = reqUser.UserId
+	user.Username = reqUser.Username
+	user.Password = reqUser.Password
+	user.Role = reqUser.Role
+	user.Status = reqUser.Status
+	user.Remarks = reqUser.Remarks
+	user.MobileNumber = reqUser.MobileNumber
+	user.OrgStatus = existingOrg.Status
+	user.OrgUUID = existingOrg.OrgUUID
+	user.UId = uuid.New().String()
+	user.CreatedTime = time.Now().UTC().Format(time.RFC3339)
+	user.UpdatedTime = time.Now().UTC().Format(time.RFC3339)
+	// Set the update history
+
+	user.UpdateHistory = append(user.UpdateHistory, models.UpdateHistory{
+		UpdatedTime:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedComments: strings.Join([]string{"Owner created"}, ", "),
+		UpdateBy:        "System",
+	})
 	// Ensure the role is set to Admin
 	user.Role = models.Owner
-
-	// Ensure uId is not set by the payload
-	user.UId = 0
 
 	createdUser, err := uc.Service.CreateUser(c.Request.Context(), &user)
 	if err != nil {
@@ -444,24 +666,24 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param orgId query string true "Organisation ID"
+// @Param org_id  header string true "Organisation Id"
 // @Success 200 {array} string
 // @Failure 400 {object} ErrorResponse
 // @Failure 403 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
-// @Router /users/roles [get]
+// @Router /api/v1/users/roles [get]
 func (uc *UserController) GetUserRoles(c *gin.Context) {
-	orgId := c.Query("orgId")
-	if orgId == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "orgId is required"})
+	org_id := c.GetHeader("org_id")
+	if org_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
 		return
 	}
 
 	// Check if the organisation exists and is active
-	isActive, err := uc.OrgService.IsOrgActive(c.Request.Context(), orgId)
-	if err != nil {
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
+	if existingOrg == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
 		return
 	}
@@ -472,12 +694,50 @@ func (uc *UserController) GetUserRoles(c *gin.Context) {
 
 	// Return the list of user roles
 	roles := []string{
-		string(models.Admin),
 		string(models.OperationsLead),
 		string(models.FieldLead),
 		string(models.FieldExecutive),
-		string(models.Owner),
 		string(models.OperationsExecutive),
 	}
 	c.JSON(http.StatusOK, roles)
+}
+
+// GetUserStatuses godoc
+// @Summary Get user statuses
+// @Description Retrieve all user statuses defined in the system
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param org_id  header string true "Organisation Id"
+// @Success 200 {array} string
+// @Failure 500 {object} InternalErrorResponse
+// @Router /api/v1/users/statuses [get]
+func (uc *UserController) GetUserStatuses(c *gin.Context) {
+	// Return the list of user statuses
+	org_id := c.GetHeader("org_id")
+	if org_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "org_id is required"})
+		return
+	}
+
+	// Check if the organisation exists and is active
+	isActive, existingOrg := uc.OrgService.IsOrgActive(c.Request.Context(), org_id)
+	if existingOrg == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate organisation"})
+		return
+	}
+	if !isActive {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Organisation not found or inactive"})
+		return
+	}
+	statuses := []string{
+		string(models.Created),
+		string(models.Confirmed),
+		string(models.Verified),
+		string(models.Active),
+		string(models.InActive),
+		string(models.Disabled),
+		string(models.Banned),
+	}
+	c.JSON(http.StatusOK, statuses)
 }
