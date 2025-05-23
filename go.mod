@@ -1,4 +1,4 @@
-module kowtha_be
+module fverify_be
 
 go 1.24
 
