@@ -18,7 +18,7 @@ func NewProspectRepository(client *mongo.Client, dbName, collectionName string) 
 	return &ProspectRepositoryImpl{collection: collection}
 }
 
-func (r *ProspectRepositoryImpl) Create(ctx context.Context, prospect *models.ProspectModel) error {
+func (r *ProspectRepositoryImpl) Create(ctx context.Context, prospect *models.Prospect) error {
 	_, err := r.collection.InsertOne(ctx, prospect)
 	if err != nil {
 		return err
@@ -26,13 +26,13 @@ func (r *ProspectRepositoryImpl) Create(ctx context.Context, prospect *models.Pr
 	return nil
 }
 
-func (r *ProspectRepositoryImpl) GetByID(ctx context.Context, id string) (*models.ProspectModel, error) {
-	var prospect models.ProspectModel
+func (r *ProspectRepositoryImpl) GetByID(ctx context.Context, id string) (*models.Prospect, error) {
+	var prospect models.Prospect
 	err := r.collection.FindOne(ctx, bson.M{"uid": id}).Decode(&prospect)
 	return &prospect, err
 }
 
-func (r *ProspectRepositoryImpl) Update(ctx context.Context, prospect *models.ProspectModel) error {
+func (r *ProspectRepositoryImpl) Update(ctx context.Context, prospect *models.Prospect) error {
 	_, err := r.collection.UpdateOne(ctx, bson.M{"uid": prospect.UId}, bson.M{"$set": prospect})
 	return err
 }
@@ -42,16 +42,16 @@ func (r *ProspectRepositoryImpl) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (r *ProspectRepositoryImpl) FindAll(ctx context.Context) ([]*models.ProspectModel, error) {
+func (r *ProspectRepositoryImpl) FindAll(ctx context.Context) ([]*models.Prospect, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var prospects []*models.ProspectModel
+	var prospects []*models.Prospect
 	for cursor.Next(ctx) {
-		var prospect models.ProspectModel
+		var prospect models.Prospect
 		if err := cursor.Decode(&prospect); err != nil {
 			return nil, err
 		}
@@ -59,8 +59,8 @@ func (r *ProspectRepositoryImpl) FindAll(ctx context.Context) ([]*models.Prospec
 	}
 	return prospects, nil
 }
-func (r *ProspectRepositoryImpl) GetProspects(ctx context.Context, skip int, limit int) ([]models.ProspectModel, error) {
-	var prospects []models.ProspectModel
+func (r *ProspectRepositoryImpl) GetProspects(ctx context.Context, skip int, limit int) ([]models.Prospect, error) {
+	var prospects []models.Prospect
 
 	// MongoDB query with skip and limit
 	cursor, err := r.collection.Find(ctx, bson.M{}, options.Find().SetSkip(int64(skip)).SetLimit(int64(limit)))

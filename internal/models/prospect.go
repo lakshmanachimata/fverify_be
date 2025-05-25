@@ -27,7 +27,7 @@ const (
 	Postponed   ProspectStatus = "Postponed"
 )
 
-// ProspectModel represents a prospect in the system.
+// Prospect represents a prospect in the system.
 // @Description Prospect model containing all prospect-related information.
 //
 //	@Example {
@@ -64,7 +64,7 @@ const (
 //	  "uploaded_images": ["image1.jpg", "image2.jpg"],
 //	  "remarks": "Prospect is under review"
 //	}
-type ProspectModel struct {
+type Prospect struct {
 	UId                   string          `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`                     // unique identifier for the prospect
 	ProspectId            string          `bson:"prospect_id" json:"prospect_id" example:"P12345"`                                   // Unique prospect ID
 	ApplicantName         string          `bson:"applicant_name" json:"applicant_name" example:"John Doe"`                           // Name of the applicant
@@ -104,7 +104,7 @@ type ProspectModel struct {
 	UpdateHistory         []UpdateHistory `bson:"update_history" json:"update_history"`                                              // Comments about the last update
 }
 
-// ProspectModel represents a prospect in the system.
+// Prospect represents a prospect in the system.
 // @Description Prospect model containing all prospect-related information.
 //
 //	@Example {
@@ -140,7 +140,7 @@ type ProspectModel struct {
 //	  "uploaded_images": ["image1.jpg", "image2.jpg"],
 //	  "remarks": "Prospect is under review"
 //	}
-type ProspecReqtModel struct {
+type ProspecReq struct {
 	ProspectId            string         `bson:"prospect_id" json:"prospect_id" example:"P12345"`                                   // Unique prospect ID
 	ApplicantName         string         `bson:"applicant_name" json:"applicant_name" example:"John Doe"`                           // Name of the applicant
 	NameVerified          bool           `bson:"name_verified" json:"name_verified" example:"true"`                                 // Name verification status

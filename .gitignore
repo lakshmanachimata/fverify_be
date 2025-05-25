@@ -26,3 +26,4 @@ go.work.sum
 cmd/__debug**
 cmd/__release**
 cmd/config_db.json
+cmd/cmd

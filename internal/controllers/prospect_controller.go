@@ -60,7 +60,7 @@ func (pc *ProspectController) GetProspectsCount(c *gin.Context) {
 // @Param limit query int false "Number of records to retrieve" default(10)
 // @Param Authorization header string true "Bearer token"
 // @Param org_id header string true "Organisation Id"
-// @Success 200 {array} models.ProspectModel
+// @Success 200 {array} models.Prospect
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/prospects [get]
@@ -107,22 +107,22 @@ func (pc *ProspectController) GetProspects(c *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Param prospect body models.ProspecReqtModel true "Prospect data"
-// @Success 201 {object} models.ProspectModel
+// @Param prospect body models.ProspecReq true "Prospect data"
+// @Success 201 {object} models.Prospect
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/prospects [post]
 func (pc *ProspectController) CreateProspect(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
-	var reqProspect models.ProspecReqtModel
+	var reqProspect models.ProspecReq
 	if err := c.ShouldBindJSON(&reqProspect); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Map all fields from ProspecReqtModel to ProspectModel
-	var prospect models.ProspectModel = models.ProspectModel{
+	// Map all fields from ProspecReq to Prospect
+	var prospect models.Prospect = models.Prospect{
 		ProspectId:            reqProspect.ProspectId,
 		ApplicantName:         reqProspect.ApplicantName,
 		MobileNumber:          reqProspect.MobileNumber,
@@ -184,7 +184,7 @@ func (pc *ProspectController) CreateProspect(c *gin.Context) {
 // @Param uid path string true "Prospect UID"
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Success 200 {object} models.ProspectModel
+// @Success 200 {object} models.Prospect
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
@@ -211,8 +211,8 @@ func (pc *ProspectController) GetProspect(c *gin.Context) {
 // @Param uid path string true "Prospect UId"
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Param prospect body models.ProspecReqtModel true "Updated prospect data"
-// @Success 200 {object} models.ProspectModel
+// @Param prospect body models.ProspecReq true "Updated prospect data"
+// @Success 200 {object} models.Prospect
 // @Failure 400 {object} ErrorResponse
 // @Failure 404 {object} NotFoundResponse
 // @Failure 500 {object} InternalErrorResponse
@@ -229,7 +229,7 @@ func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 		return
 	}
 
-	var reqProspect models.ProspecReqtModel
+	var reqProspect models.ProspecReq
 	if err := c.ShouldBindJSON(&reqProspect); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -329,7 +329,7 @@ func (pc *ProspectController) UpdateProspect(c *gin.Context) {
 		updateComments = append(updateComments, "Employee Id / Business Id updated")
 	}
 
-	// Map updated fields from ProspecReqtModel to ProspectModel
+	// Map updated fields from ProspecReq to Prospect
 	existingProspect.ProspectId = reqProspect.ProspectId
 	existingProspect.ApplicantName = reqProspect.ApplicantName
 	existingProspect.MobileNumber = reqProspect.MobileNumber

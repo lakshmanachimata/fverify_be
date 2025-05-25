@@ -9,16 +9,16 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type OrganisationRepository struct {
+type OrganisationRepositoryImpl struct {
 	collection *mongo.Collection
 }
 
-func NewOrganisationRepository(client *mongo.Client, dbName, collectionName string) *OrganisationRepository {
+func NewOrganisationRepository(client *mongo.Client, dbName, collectionName string) *OrganisationRepositoryImpl {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &OrganisationRepository{collection: collection}
+	return &OrganisationRepositoryImpl{collection: collection}
 }
 
-func (r *OrganisationRepository) Create(ctx context.Context, org *models.Organisation) (*models.Organisation, error) {
+func (r *OrganisationRepositoryImpl) Create(ctx context.Context, org *models.Organisation) (*models.Organisation, error) {
 	// Generate a UUID for the organisation
 	org.OrgUUID = uuid.New().String()
 
@@ -29,7 +29,7 @@ func (r *OrganisationRepository) Create(ctx context.Context, org *models.Organis
 	return org, nil
 }
 
-func (r *OrganisationRepository) Update(ctx context.Context, org_id string, org *models.Organisation) error {
+func (r *OrganisationRepositoryImpl) Update(ctx context.Context, org_id string, org *models.Organisation) error {
 	_, err := r.collection.UpdateOne(
 		ctx,
 		bson.M{"org_id": org_id},
@@ -38,11 +38,11 @@ func (r *OrganisationRepository) Update(ctx context.Context, org_id string, org 
 	return err
 }
 
-func (r *OrganisationRepository) Delete(ctx context.Context, org_id string) error {
+func (r *OrganisationRepositoryImpl) Delete(ctx context.Context, org_id string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"org_id": org_id})
 	return err
 }
-func (r *OrganisationRepository) GetAllOrganisations(ctx context.Context) ([]*models.Organisation, error) {
+func (r *OrganisationRepositoryImpl) GetAllOrganisations(ctx context.Context) ([]*models.Organisation, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (r *OrganisationRepository) GetAllOrganisations(ctx context.Context) ([]*mo
 	}
 	return organisations, nil
 }
-func (r *OrganisationRepository) IsOrgActive(ctx context.Context, org_id string) (bool, *models.Organisation) {
+func (r *OrganisationRepositoryImpl) IsOrgActive(ctx context.Context, org_id string) (bool, *models.Organisation) {
 	var org models.Organisation
 	err := r.collection.FindOne(ctx, bson.M{"org_id": org_id, "status": models.Active}).Decode(&org)
 	if err != nil {
@@ -70,7 +70,7 @@ func (r *OrganisationRepository) IsOrgActive(ctx context.Context, org_id string)
 	}
 	return true, &org
 }
-func (r *OrganisationRepository) GetOrganisationByID(ctx context.Context, org_id string) (*models.Organisation, error) {
+func (r *OrganisationRepositoryImpl) GetOrganisationByID(ctx context.Context, org_id string) (*models.Organisation, error) {
 	var org models.Organisation
 	err := r.collection.FindOne(ctx, bson.M{"org_id": org_id}).Decode(&org)
 	if err != nil {

@@ -34,8 +34,8 @@ func NewUserRepository(client *mongo.Client, dbName, collectionName string) *Use
 	return &UserRepositoryImpl{collection: collection}
 }
 
-func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgUUID string) (*models.UserModel, error) {
-	var user models.UserModel
+func (r *UserRepositoryImpl) ValidateUser(ctx context.Context, username, password string, orgUUID string) (*models.User, error) {
+	var user models.User
 	err := r.collection.FindOne(ctx, bson.M{"username": username, "org_uuid": orgUUID}).Decode(&user)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (r *UserRepositoryImpl) SetPassword(ctx context.Context, uId string, newPas
 	return err
 }
 
-func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel) (*models.UserRespModel, error) {
+func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.User) (*models.UserResp, error) {
 	// Generate the next unique ID (uId)
 	// Hash the password
 	hashedPassword, err := HashPassword(user.Password)
@@ -79,14 +79,14 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 	}
 
 	// Retrieve the inserted user document
-	var createdUser models.UserModel
+	var createdUser models.User
 	err = r.collection.FindOne(ctx, bson.M{"_id": result.InsertedID}).Decode(&createdUser)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert to UserRespModel
-	createdUserResp := models.UserRespModel{
+	// Convert to UserResp
+	createdUserResp := models.UserResp{
 		UId:           createdUser.UId,
 		UserId:        createdUser.UserId,
 		Username:      createdUser.Username,
@@ -102,14 +102,14 @@ func (r *UserRepositoryImpl) Create(ctx context.Context, user *models.UserModel)
 	return &createdUserResp, nil
 }
 
-func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserRespModel, error) {
-	var user models.UserRespModel
+func (r *UserRepositoryImpl) GetByUserID(ctx context.Context, userId string) (*models.UserResp, error) {
+	var user models.UserResp
 	err := r.collection.FindOne(ctx, bson.M{"userid": userId}).Decode(&user)
 	return &user, err
 }
 
-func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid string) (*models.UserRespModel, error) {
-	var user models.UserRespModel
+func (r *UserRepositoryImpl) GetByUserUID(ctx context.Context, uid string) (*models.UserResp, error) {
+	var user models.UserResp
 	err := r.collection.FindOne(ctx, bson.M{"uid": uid}).Decode(&user)
 	return &user, err
 }
@@ -123,16 +123,16 @@ func (r *UserRepositoryImpl) DeleteByUserId(ctx context.Context, userId string) 
 	return err
 }
 
-func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserRespModel, error) {
+func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserResp, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var users []*models.UserRespModel
+	var users []*models.UserResp
 	for cursor.Next(ctx) {
-		var user models.UserRespModel
+		var user models.UserResp
 		if err := cursor.Decode(&user); err != nil {
 			return nil, err
 		}
@@ -141,9 +141,9 @@ func (r *UserRepositoryImpl) GetAllUsers(ctx context.Context) ([]*models.UserRes
 	return users, nil
 }
 
-func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel, authUserName string) (*models.UserRespModel, error) {
+func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.User, authUserName string) (*models.UserResp, error) {
 	// Update the UpdatedTime field
-	var eUser models.UserModel
+	var eUser models.User
 	err := r.collection.FindOne(ctx, bson.M{"uid": user.UId}).Decode(&eUser)
 	if err != nil {
 		return nil, err
@@ -196,8 +196,8 @@ func (r *UserRepositoryImpl) Update(ctx context.Context, user *models.UserModel,
 	if err != nil {
 		return nil, err
 	}
-	// Convert to UserRespModel
-	createdUserResp := models.UserRespModel{
+	// Convert to UserResp
+	createdUserResp := models.UserResp{
 		UId:           user.UId,
 		UserId:        user.UserId,
 		Username:      user.Username,

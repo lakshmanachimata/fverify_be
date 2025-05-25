@@ -62,8 +62,8 @@ func NewUserController(userService *services.UserService, orgService *services.O
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 201 {object} models.UserRespModel
+// @Param user body models.UserReq true "User data (all fields are mandatory)"
+// @Success 201 {object} models.UserResp
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} InternalErrorResponse
@@ -71,7 +71,7 @@ func NewUserController(userService *services.UserService, orgService *services.O
 func (uc *UserController) CreateUser(c *gin.Context) {
 	claims, _ := c.Get("user")
 	authUser := claims.(*auth.AuthTokenClaims)
-	var reqUser models.UserReqModel
+	var reqUser models.UserReq
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -126,7 +126,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 		return
 	}
-	var user models.UserModel
+	var user models.User
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
 	user.Password = reqUser.Password
@@ -165,7 +165,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
 // @Param userId path int true "User ID"
-// @Success 200 {object} models.UserRespModel
+// @Success 200 {object} models.UserResp
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
@@ -190,7 +190,7 @@ func (uc *UserController) GetUserByUserID(c *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
-// @Success 200 {array} models.UserRespModel
+// @Success 200 {array} models.UserResp
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/users [get]
@@ -272,8 +272,8 @@ func (uc *UserController) DeleteUserByUserId(c *gin.Context) {
 // @Param Authorization header string true "Bearer token"
 // @Param org_id  header string true "Organisation Id"
 // @Param uId path string true "User uId"
-// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 200 {object} models.UserRespModel
+// @Param user body models.UserReq true "User data (all fields are mandatory)"
+// @Success 200 {object} models.UserResp
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} InvalidAuthResponse
 // @Failure 404 {object} NotFoundResponse
@@ -285,7 +285,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 
 	uIdParam := c.Param("uId")
 
-	var reqUser models.UserReqModel
+	var reqUser models.UserReq
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
@@ -342,7 +342,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	}
 
 	// Update user data
-	var user models.UserModel
+	var user models.User
 	user.UId = uIdParam
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
@@ -504,14 +504,14 @@ func (uc *UserController) SetPassword(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param X-API-Key header string true "API key"
-// @Param user body models.UserReqModel true "Admin user data"
-// @Success 201 {object} models.UserRespModel
+// @Param user body models.UserReq true "Admin user data"
+// @Success 201 {object} models.UserResp
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/users/admin/create [post]
 func (uc *UserController) CreateAdmin(c *gin.Context) {
-	var reqUser models.UserReqModel
+	var reqUser models.UserReq
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
@@ -559,7 +559,7 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 		return
 	}
 
-	var user models.UserModel
+	var user models.User
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
 	user.Password = reqUser.Password
@@ -598,14 +598,14 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param X-API-Key header string true "API key"
-// @Param user body models.UserReqModel true "User data (all fields are mandatory)"
-// @Success 201 {object} models.UserRespModel
+// @Param user body models.UserReq true "User data (all fields are mandatory)"
+// @Success 201 {object} models.UserResp
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} InternalErrorResponse
 // @Router /api/v1/users/owner/create [post]
 func (uc *UserController) CreateOwner(c *gin.Context) {
-	var reqUser models.UserReqModel
+	var reqUser models.UserReq
 	if err := c.ShouldBindJSON(&reqUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
@@ -628,7 +628,7 @@ func (uc *UserController) CreateOwner(c *gin.Context) {
 		return
 	}
 
-	var user models.UserModel
+	var user models.User
 	user.UserId = reqUser.UserId
 	user.Username = reqUser.Username
 	user.Password = reqUser.Password

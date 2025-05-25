@@ -35,7 +35,7 @@ type UpdateHistory struct {
 	UpdateBy        string `bson:"update_by" json:"update_by" example:"admin"`                           // User who made the update
 }
 
-// UserModel represents a user in the system.
+// User represents a user in the system.
 // @Description User model containing all user-related information.
 //
 //		@Example {
@@ -56,7 +56,7 @@ type UpdateHistory struct {
 //		  "remarks": "User is active and verified",
 //		  "org_uuid": "123e4567-e89b-12d3-a456-426614174000"
 //		}
-type UserRespModel struct {
+type UserResp struct {
 	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
 	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
 	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
@@ -71,7 +71,7 @@ type UserRespModel struct {
 	OrgUUID       string             `bson:"org_uuid" json:"org_uuid" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
 }
 
-// UserModel represents a user in the system.
+// User represents a user in the system.
 // @Description User model containing all user-related information.
 //
 //		@Example {
@@ -93,7 +93,7 @@ type UserRespModel struct {
 //		  "remarks": "User is active and verified",
 //		  "org_uuid": "123e4567-e89b-12d3-a456-426614174000"
 //		}
-type UserModel struct {
+type User struct {
 	UId           string             `bson:"uid" json:"uid" example:"123e4567-e89b-12d3-a456-426614174111"`           // Auto-incremented unique identifier
 	UserId        string             `bson:"userid" json:"userid" example:"112345"`                                   // Unique identifier for the user
 	Username      string             `bson:"username" json:"username" example:"john_doe"`                             // Username of the user
@@ -109,7 +109,7 @@ type UserModel struct {
 	OrgUUID       string             `bson:"org_uuid" json:"org_uuid" example:"123e4567-e89b-12d3-a456-426614174000"` // UUID of the organization
 }
 
-// UserModel represents a user in the system.
+// User represents a user in the system.
 // @Description User model containing all user-related information.
 //
 //		@Example {
@@ -123,7 +123,7 @@ type UserModel struct {
 //		  "org_id": "123e4567-e89b-12d3-a456-426614174000"
 //		}
 
-type UserReqModel struct {
+type UserReq struct {
 	UserId       string     `bson:"userid" json:"userid" binding:"required" example:"112345"`                         // Unique identifier for the user
 	Username     string     `bson:"username" json:"username"  binding:"required" example:"john_doe"`                  // Username of the user
 	Password     string     `bson:"password" json:"password"   example:"plane_password"`                              // Hashed password

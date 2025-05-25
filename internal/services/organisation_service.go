@@ -7,11 +7,11 @@ import (
 )
 
 type OrganisationService struct {
-	repo     *repositories.OrganisationRepository
+	repo     *repositories.OrganisationRepositoryImpl
 	userRepo *repositories.UserRepositoryImpl
 }
 
-func NewOrganisationService(repo *repositories.OrganisationRepository, userRepo *repositories.UserRepositoryImpl) *OrganisationService {
+func NewOrganisationService(repo *repositories.OrganisationRepositoryImpl, userRepo *repositories.UserRepositoryImpl) *OrganisationService {
 	return &OrganisationService{repo: repo, userRepo: userRepo}
 }
 

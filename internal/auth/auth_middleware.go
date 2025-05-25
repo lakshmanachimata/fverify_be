@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func AuthMiddleware(orgRepo repositories.OrganisationRepository, userRepo repositories.UserRepositoryImpl, requiredRoles ...string) gin.HandlerFunc {
+func AuthMiddleware(orgRepo repositories.OrganisationRepositoryImpl, userRepo repositories.UserRepositoryImpl, requiredRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract the token from the Authorization header
 		authHeader := c.GetHeader("Authorization")
