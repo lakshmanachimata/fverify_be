@@ -246,7 +246,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ProspectModel"
+                                "$ref": "#/definitions/models.Prospect"
                             }
                         }
                     },
@@ -297,7 +297,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ProspecReqtModel"
+                            "$ref": "#/definitions/models.ProspecReq"
                         }
                     }
                 ],
@@ -305,7 +305,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.ProspectModel"
+                            "$ref": "#/definitions/models.Prospect"
                         }
                     },
                     "400": {
@@ -408,7 +408,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ProspectModel"
+                            "$ref": "#/definitions/models.Prospect"
                         }
                     },
                     "400": {
@@ -473,7 +473,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ProspecReqtModel"
+                            "$ref": "#/definitions/models.ProspecReq"
                         }
                     }
                 ],
@@ -481,7 +481,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ProspectModel"
+                            "$ref": "#/definitions/models.Prospect"
                         }
                     },
                     "400": {
@@ -540,7 +540,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.UserRespModel"
+                                "$ref": "#/definitions/models.UserResp"
                             }
                         }
                     },
@@ -591,7 +591,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
+                            "$ref": "#/definitions/models.UserReq"
                         }
                     }
                 ],
@@ -599,7 +599,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserRespModel"
+                            "$ref": "#/definitions/models.UserResp"
                         }
                     },
                     "400": {
@@ -650,7 +650,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
+                            "$ref": "#/definitions/models.UserReq"
                         }
                     }
                 ],
@@ -658,7 +658,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserRespModel"
+                            "$ref": "#/definitions/models.UserResp"
                         }
                     },
                     "400": {
@@ -761,7 +761,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
+                            "$ref": "#/definitions/models.UserReq"
                         }
                     }
                 ],
@@ -769,7 +769,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.UserRespModel"
+                            "$ref": "#/definitions/models.UserResp"
                         }
                     },
                     "400": {
@@ -940,7 +940,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserReqModel"
+                            "$ref": "#/definitions/models.UserReq"
                         }
                     }
                 ],
@@ -948,7 +948,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserRespModel"
+                            "$ref": "#/definitions/models.UserResp"
                         }
                     },
                     "400": {
@@ -1164,7 +1164,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.UserRespModel"
+                            "$ref": "#/definitions/models.UserResp"
                         }
                     },
                     "400": {
@@ -1435,7 +1435,7 @@ const docTemplate = `{
                 "OrgInActive"
             ]
         },
-        "models.ProspecReqtModel": {
+        "models.ProspecReq": {
             "description": "Prospect model containing all prospect-related information.",
             "type": "object",
             "properties": {
@@ -1610,7 +1610,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ProspectModel": {
+        "models.Prospect": {
             "description": "Prospect model containing all prospect-related information.",
             "type": "object",
             "properties": {
@@ -1899,7 +1899,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UserReqModel": {
+        "models.UserReq": {
             "type": "object",
             "required": [
                 "mobile_number",
@@ -1961,7 +1961,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UserRespModel": {
+        "models.UserResp": {
             "description": "User model containing all user-related information.",
             "type": "object",
             "properties": {
